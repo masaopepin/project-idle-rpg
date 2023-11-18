@@ -1,0 +1,95 @@
+body {
+    background-color: rgb(32, 32, 32);
+    color:white;
+    font-size: 18px;
+}
+
+header {
+    font-size: 22px;
+}
+
+.row {
+    margin: 0px;
+}
+
+.sidebar-header {
+    width: 100%;
+    font-size: 18px;
+    border-left: 0px;
+    border-right: 0px;
+    border-bottom: 0px;
+    border-radius: 0px;
+    border-color: rgb(100, 100, 100);
+    color: white;
+}
+
+.sidebar-header:hover {
+    background-color: #424649;
+}
+
+.sidebar-link {
+    font-size: 17px;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+}
+
+.sidebar-link:hover {
+    background-color: rgb(26, 27, 29);
+}
+
+.close-button {
+    color: rgb(175, 0, 0);
+    font-size: x-large;
+    margin-left: auto;
+}
+
+.close-button:hover {
+    color: red;
+}
+
+.section {
+    background-color: #424649;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    border-color: black;
+    margin-top: 10px;
+    color: white;
+}
+
+.progress-bar {
+    transition-duration: 0.04s;
+}
+
+@media (hover: none) {
+    .tooltip-hover-none {
+        display: none;
+    }
+}
+
+@media (max-width: 265px) {
+    .page-title {
+        display: none;
+    }
+}
+
+@media (max-width: 400px) {
+    .money-label {
+        display: none;
+    }
+}
+
+.item-icon {
+    width: 75px;
+    height: 75px;
+}
+
+.item-icon:hover {
+    border-color: goldenrod;
+}
+
+.toast-reward {
+    pointer-events: none;
+    width: auto;
+    margin: auto;
+}
