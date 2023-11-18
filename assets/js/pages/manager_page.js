@@ -81,6 +81,7 @@ export class Manager_Page {
         this.moreToggle = document.getElementById("more-toggle");
         const morePages = document.getElementById("more-pages");
         this.navButtons.add(new Nav_Button(morePages, "./assets/icons/misc/settings.png", "settings", () => { this.switchPage("settings"); }));
+        this.navButtons.add(new Nav_Button(morePages, "", "toggleFullscreen", () => { this.toggleFullscreen(); }));
 
         if (this.game.languages.isLanguageLoaded === true) {
             this.languageLoaded();
@@ -166,6 +167,41 @@ export class Manager_Page {
 
         if (this.currentPage !== null) {
             this.currentPage.update();
+        }
+    }
+
+    toggleFullscreen() {
+        // Exit
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+            return;
+        }
+        else if (document.webkitFullscreenElement) {
+            document.webkitExitFullscreen();
+            return;
+        }
+        else if (document.msFullscreenElement) {
+            document.msExitFullscreen();
+            return;
+        }
+        else if (document.mozFullscreenElement) {
+            document.mozExitFullscreen();
+            return;
+        }
+
+        const elem = document.documentElement;
+        // Enter
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        }
+        else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        }
+        else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
+        else if (elem.mozRequestFullscreen) {
+            elem.mozRequestFullscreen();
         }
     }
 

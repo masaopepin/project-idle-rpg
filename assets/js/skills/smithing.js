@@ -57,8 +57,8 @@ export class Smithing extends Skill {
                             {
                                 type: "item",
                                 itemId: "ironOre",
-                                amount: 1
-                            },
+                                amount: 2
+                            }
                         ],
                         conditionsData: [
                             {
@@ -90,6 +90,11 @@ export class Smithing extends Skill {
                                 itemId: "ironOre",
                                 amount: 1
                             },
+                            {
+                                type: "item",
+                                itemId: "coalOre",
+                                amount: 1
+                            }
                         ],
                         conditionsData: [
                             {

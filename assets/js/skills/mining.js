@@ -39,6 +39,30 @@ export class Mining extends Skill {
                 {
                     id: "node_tinRock",
                     actionId: "action_mine",
+                    duration: 2000,
+                    conditionsData: [
+                        {
+                            type: "skillLevel",
+                            skillId: "mining",
+                            skillLevel: 1
+                        }
+                    ],
+                    rewardsData: [
+                        {
+                            type: "skillXp",
+                            skillId: "mining",
+                            amount: 5
+                        },
+                        {
+                            type: "item",
+                            itemId: "tinOre",
+                            amount: 1
+                        }
+                    ]
+                },
+                {
+                    id: "node_ironRock",
+                    actionId: "action_mine",
                     duration: 3000,
                     conditionsData: [
                         {
@@ -55,13 +79,13 @@ export class Mining extends Skill {
                         },
                         {
                             type: "item",
-                            itemId: "tinOre",
+                            itemId: "ironOre",
                             amount: 1
                         }
                     ]
                 },
                 {
-                    id: "node_ironRock",
+                    id: "node_coalRock",
                     actionId: "action_mine",
                     duration: 4000,
                     conditionsData: [
@@ -79,7 +103,7 @@ export class Mining extends Skill {
                         },
                         {
                             type: "item",
-                            itemId: "ironOre",
+                            itemId: "coalOre",
                             amount: 1
                         }
                     ]

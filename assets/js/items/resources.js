@@ -57,13 +57,24 @@ export const RESOURCES = {
                 {
                     type: "item",
                     itemId: "money",
-                    amount: 50
+                    amount: 20
                 }
             ]
         },
         {
             id: "ironOre",
             icon: "./assets/icons/resources/ores/iron_ore.png",
+            sellData: [
+                {
+                    type: "item",
+                    itemId: "money",
+                    amount: 50
+                }
+            ]
+        },
+        {
+            id: "coalOre",
+            icon: "./assets/icons/resources/ores/coal_ore.png",
             sellData: [
                 {
                     type: "item",
