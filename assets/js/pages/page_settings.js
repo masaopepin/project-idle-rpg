@@ -1,5 +1,5 @@
 import { Page } from "./page.js";
-import { createGenericButton, createGenericElement, createGenericInput } from "../helpers/helpers_html.js";
+import { createGenericElement, createGenericInput, createOpenModalButton } from "../helpers/helpers_html.js";
 import { Dropdown_Generic } from "../ui/dropdowns/dropdown_generic.js";
 
 /** 
@@ -45,13 +45,23 @@ export class Page_Settings extends Page {
             }
          });
 
-        // Delete save game
+        // Delete saves
         const saveGameRow = createGenericElement(this.container, {className: "row section"});
-        createGenericButton(saveGameRow, {className: "btn btn-dark", innerHTML: "Clear local save"}, {onclick: () => { 
-                localStorage.clear();
-                console.log("Save data cleared.");
-            }
+        createOpenModalButton(saveGameRow, {
+            className: "col btn btn-dark",
+            innerHTML: this.game.languages.getString("deleteCharacter")
+        }, {
+            id: "#modal-confirm",
+            onclick: () => { this.game.pages.modalConfirm.update(this.game, "confirm_deleteCharacter", () => { this.deleteCharacter(); })}
         });
+        createOpenModalButton(saveGameRow, {
+            className: "col btn btn-dark",
+            innerHTML: this.game.languages.getString("restoreSettings")
+        }, {
+            id: "#modal-confirm",
+            onclick: () => { this.game.pages.modalConfirm.update(this.game, "confirm_restoreSettings", () => { this.restoreSettings(); })}
+        });
+
         document.addEventListener("languageLoaded", (e) => { this.languageLoaded(e); }, {signal: this.abortController.signal});
     }
     
@@ -89,5 +99,15 @@ export class Page_Settings extends Page {
             innerHTML: innerHTML,
             attributes: {for: forId}
         });
+    }
+
+    deleteCharacter() {
+        localStorage.removeItem("Player");
+        location.reload();
+    }
+
+    restoreSettings() {
+        localStorage.removeItem("Settings");
+        location.reload();
     }
 }

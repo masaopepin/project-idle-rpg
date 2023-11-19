@@ -29,6 +29,7 @@ export class Action_Crafting extends Action {
     load(actionSave) {
         super.load(actionSave);
         this.craftingRecipe = this.game.skills.getSkill(actionSave.skillId).createCraftingRecipeFromId(actionSave.craftingRecipeId);
+        this.rewards = this.craftingRecipe.rewards;
     }
 
     getString() {
@@ -41,8 +42,14 @@ export class Action_Crafting extends Action {
 
     /** @param {import("./action.js").ActionData} actionData An object containing info about the action. */
     setAction(actionData) {
+        const recipe = actionData.craftingRecipe;
+        if (recipe === undefined) {
+            this.craftingRecipe = this.game.errors.craftingRecipe;
+            return;
+        }
+        actionData.rewards = recipe.rewards;
+        this.craftingRecipe = recipe;
         super.setAction(actionData);
-        this.craftingRecipe = actionData.craftingRecipe === undefined ? this.game.errors.craftingRecipe : actionData.craftingRecipe;
     }
 
     /** @param {import("./action.js").ActionData} actionData An object containing info about the action. */
@@ -80,11 +87,9 @@ export class Action_Crafting extends Action {
     end() {
         if (this.game.inventory.isFull) {
             this.stop();
+            return;
         }
-        else {
-            this.craftingRecipe.rewards.giveRewards();
-            super.end();
-        }
+        super.end();
     }
 
     stop() {

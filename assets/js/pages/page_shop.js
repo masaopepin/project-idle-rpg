@@ -118,7 +118,7 @@ export class Page_Shop extends Page {
 
         const costs = new Costs(this.game, item.buyData);
         const costsRoot = createGenericElement(itemInfoDiv, {className: "d-lg-flex"});
-        costs.createCostsLabel(costsRoot);
+        costs.createCostLabels(costsRoot);
 
         const buyButton = createOpenModalButton(itemBg, {className: "btn btn-success mt-1", innerHTML: this.buyString}, {id: "#modal-shop", onclick: (e) => { this.shopModal.update(shopItem, costs); }});
 

@@ -67,8 +67,7 @@ export class Page_Summary extends Page {
 
         for (const actionRow of this.actionRows) {
             if (actionRow.action === eventData.action) {
-                actionRow.actionName.innerHTML = this.game.languages.getString(actionRow.action.id);
-                actionRow.actionString.innerHTML = actionRow.action.getString();
+                actionRow.update();
                 return;
             }
         }
@@ -89,7 +88,7 @@ export class Page_Summary extends Page {
 
     update() {
         for (const actionRow of this.actionRows) {
-            actionRow.actionProgress.update(actionRow.action.elapsedTime, actionRow.action.duration, actionRow.action.elapsedPercent);
+            actionRow.updateProgress();
         }
     }
 

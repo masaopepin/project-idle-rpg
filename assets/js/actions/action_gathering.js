@@ -25,10 +25,11 @@ export class Action_Gathering extends Action {
         return actionSave;
     }
 
-    /** @param actionSave An object containing info about the saved action. */
+    /** @param {import("./action.js").ActionSave} actionSave An object containing info about the saved action. */
     load(actionSave) {
         super.load(actionSave);
         this.gatheringNode = this.game.skills.getSkill(actionSave.skillId).createGatheringNodeFromId(actionSave.gatheringNodeId);
+        this.rewards = this.gatheringNode.rewards;
     }
 
     getString() {
@@ -41,8 +42,14 @@ export class Action_Gathering extends Action {
 
     /** @param {import("./action.js").ActionData} actionData An object containing info about the action. */
     setAction(actionData) {
+        const node = actionData.gatheringNode;
+        if (node === undefined) {
+            this.gatheringNode = this.game.errors.gatheringNode;
+            return;
+        }
+        actionData.rewards = node.rewards;
+        this.gatheringNode = node;
         super.setAction(actionData);
-        this.gatheringNode = actionData.gatheringNode === undefined ? this.game.errors.gatheringNode : actionData.gatheringNode;
     }
 
     /** @param {import("./action.js").ActionData} actionData An object containing info about the action. */
@@ -79,11 +86,9 @@ export class Action_Gathering extends Action {
     end() {
         if (this.game.inventory.isFull) {
             this.stop();
+            return;
         }
-        else {
-            this.gatheringNode.rewards.giveRewards();
-            super.end();
-        }
+        super.end();
     }
 
     stop() {

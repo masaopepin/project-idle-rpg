@@ -11,28 +11,43 @@ export class Action_Row {
      */
     constructor(game, parent, action, stopString) {
         this.action = action;
-        const actionName = game.languages.getString(action.id);
+        const actionName = action === game.errors.action ? "name" : game.languages.getString(action.id);
         const actionString = action.getString();
 
-        this.row = createGenericElement(parent, {className: "d-flex flex-column flex-sm-row align-items-center section bg-dark p-1 m-1"});
-        this.actionName = createGenericElement(this.row, {className: "col-sm-2", innerHTML: actionName});
+        this.row = createGenericElement(parent, {className: "row section border-0 bg-dark p-1 m-1"});
+        const div = createGenericElement(this.row, {className: "row col-12 col-sm p-0"});
 
-        const div = createGenericElement(this.row, {className: "col-12 col-sm px-2"});
-        this.actionString = createGenericElement(div, {className: "col", innerHTML: actionString});
+        this.actionName = createGenericElement(div, {className: "col-auto fs-6 my-auto", innerHTML: actionName});
+        this.actionString = createGenericElement(div, {className: "col-auto fs-6 my-auto", innerHTML: actionString});
+        this.rewardsRoot = createGenericElement(div, {className: "col-sm d-flex"});
+        this.totalLabels = this.action.rewards.createTotalLabels(this.rewardsRoot);
 
-        //const actionProgressDiv = createGenericElement(div, {className: "col mx-2"});
-        this.actionProgress = new Progressbar(div, actionName + " " + actionString);
-        //const actionButtonDiv = createGenericElement(this.row, {className: "col-sm-2"});
-        this.stopButton = createGenericButton(this.row, {className: "col-sm-2 btn btn-danger", innerHTML: stopString}, {onclick: () => { action.stop(); }});
+        this.actionProgress = new Progressbar(div, actionName);
+        this.stopButton = createGenericButton(this.row, {className: "col-sm-2 btn btn-danger mt-auto mb-2", innerHTML: stopString}, {onclick: () => { this.action.stop(); }});
+    }
 
+    /** Update the action string and progress. */
+    update() {
+        this.actionString.innerHTML = this.action.getString();
+        this.totalLabels.forEach((totalLabel) => { totalLabel.update(); });
+        this.updateProgress();
+    }
 
-        /*this.row = createGenericElement(parent, {className: "row section bg-dark p-1 m-1"});
-        this.actionName = createGenericElement(this.row, {className: "col-12 col-sm-2 my-auto", innerHTML: actionName});
-        this.actionString = createGenericElement(this.row, {className: "col-12 col-sm-2 my-auto", innerHTML: actionString});
+    /** Update the action progressbar. */
+    updateProgress() {
+        this.actionProgress.update(this.action.elapsedTime, this.action.duration, this.action.elapsedPercent);
+    }
 
-        const actionProgressDiv = createGenericElement(this.row, {className: "col-12 col-sm-6 m-auto"});
-        this.actionProgress = new Progressbar(actionProgressDiv, actionName + " " + actionString);
-        const actionButtonDiv = createGenericElement(this.row, {className: "col-auto p-1"});
-        this.stopButton = createGenericButton(actionButtonDiv, {className: "btn btn-danger", innerHTML: stopString}, {onclick: () => { action.stop(); }});*/
+    /**
+     * Set the action associated with the row.
+     * @param {import("../actions/action.js").Action} action The action to associate to the row. 
+     */
+    setAction(game, action) {
+        this.action = action;
+        const actionName = game.languages.getString(this.action.id);;
+        this.actionName.innerHTML = actionName;
+        this.actionProgress.bar.setAttribute("aria-label", actionName);
+        this.totalLabels = this.action.rewards.createTotalLabels(this.rewardsRoot);
+        this.update();
     }
 }

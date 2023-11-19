@@ -34,7 +34,7 @@ export class Icon_Label {
         }
 
         /** The label element to the right */
-        this.label = createGenericElement(this.root, {className: "mx-2"});
+        this.label = createGenericElement(this.root, {className: "mx-2 fs-6"});
         if (labelData.updateFunction !== undefined) {
             this.updateFunction = labelData.updateFunction;
             this.label.innerHTML = this.updateFunction().toString();

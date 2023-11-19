@@ -50,17 +50,27 @@ export class Rewards {
     }
 
     /**
-     * Create a new set of icon label to display rewards.
+     * Create a new set of icon label to display the rewards.
      * @param {HTMLElement} parent The parent to append the icon labels.
      * @param {Function} [multiplierFunction] Optional function that returns a number to multiply the cost. Defaults to 1.
      * @returns {Set.<Icon_Label>} The new set of icon labels.
      */
-    createRewardsLabel(parent, multiplierFunction = () => { return 1;}) {
+    createRewardLabels(parent, multiplierFunction = () => { return 1;}) {
         removeChildren(parent);
         const labels = new Set();
-        this.rewards.forEach((reward) => {
-            labels.add(reward.createRewardLabel(parent, multiplierFunction));
-        });
+        this.rewards.forEach((reward) => { labels.add(reward.createRewardLabel(parent, multiplierFunction)); });
+        return labels;
+    }
+
+    /**
+     * Create a new set of icon label to display the total amount of rewards given since creation.
+     * @param {HTMLElement} parent The parent to append the icon labels.
+     * @returns {Set.<Icon_Label>} The new set of icon labels.
+     */
+    createTotalLabels(parent) {
+        removeChildren(parent);
+        const labels = new Set();
+        this.rewards.forEach((reward) => { labels.add(reward.createTotalLabel(parent)); });
         return labels;
     }
 }
@@ -78,6 +88,8 @@ export class Reward {
         this.type = rewardData.type === undefined ? "error" : rewardData.type;
         /** The amount of the reward. Can be any positive number. */
         this.amount = rewardData.amount === undefined ? -1 : rewardData.amount;
+        /** The total amount of reward given since creation. */
+        this.totalAmount = rewardData.totalAmount === undefined ? 0 : rewardData.totalAmount;
     }
 
     /**
@@ -98,6 +110,14 @@ export class Reward {
         console.log("Failed to create reward label with reward type: " + this.type);
         return new Icon_Label(parent);
     }
+
+    /**
+     * Create a new icon label to display the total amount of reward given since creation.
+     * @param {HTMLElement} parent The parent to append the icon label.
+     */
+    createTotalLabel(parent) {
+        console.log("Failed to create total label with reward type: " + this.type);
+    }
 }
 
 /** Class for reward that gives skill xp. */
@@ -114,7 +134,9 @@ export class Reward_Skill_Xp extends Reward {
 
     /** @param {number} amount Optional number to multiply the rewards. Defaults to 1. */
     giveReward(amount = 1) {
-        this.skill.addXp(this.amount * amount * this.skill.xpMultiplier);
+        const givenAmount = this.amount * amount * this.skill.xpMultiplier;
+        this.skill.addXp(givenAmount);
+        this.totalAmount += givenAmount;
     }
 
     /**
@@ -122,13 +144,12 @@ export class Reward_Skill_Xp extends Reward {
      * @param {Function} [multiplierFunction] Optional function that returns a number to multiply the cost. Defaults to 1.
      */
     createRewardLabel(parent, multiplierFunction = () => { return 1;}) {
-        return new Icon_Label(parent, {
-            source: this.skill.icon,
-            tooltip: this.skill.name,
-            updateFunction: () => {
-                return (this.amount * multiplierFunction() * this.skill.xpMultiplier) + " " + this.game.languages.getString("xp");
-            }
-        });
+        return new Icon_Label(parent, {source: this.skill.icon, tooltip: this.skill.name, updateFunction: () => { return (this.amount * multiplierFunction() * this.skill.xpMultiplier) + " " + this.game.languages.getString("xp"); }});
+    }
+
+    /** @param {HTMLElement} parent The parent to append the icon label. */
+    createTotalLabel(parent) {
+        return new Icon_Label(parent, {source: this.skill.icon, tooltip: this.skill.name, updateFunction: () => { return "+" + this.totalAmount + " " + this.game.languages.getString("xp"); }});
     }
 }
 
@@ -146,7 +167,9 @@ export class Reward_Item extends Reward {
 
     /** @param {number} [amount] Optional number to multiply the reward. Defaults to 1. */
     giveReward(amount = 1) {
-        this.game.inventory.addItem(this.item, this.amount * amount);
+        const givenAmount = this.amount * amount;
+        this.game.inventory.addItem(this.item, givenAmount);
+        this.totalAmount += givenAmount;
     }
 
     /**
@@ -157,9 +180,15 @@ export class Reward_Item extends Reward {
         return new Icon_Label(parent, {
             source: this.item.icon,
             tooltip: this.item.name,
-            updateFunction: () => {
-                return this.amount * multiplierFunction();
-            }
+            updateFunction: () => { return this.amount * multiplierFunction(); }
+        });
+    }
+
+    createTotalLabel(parent) {
+        return new Icon_Label(parent, {
+            source: this.item.icon,
+            tooltip: this.item.name,
+            updateFunction: () => { return "+" + this.totalAmount; }
         });
     }
 }

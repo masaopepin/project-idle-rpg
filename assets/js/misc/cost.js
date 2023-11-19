@@ -35,12 +35,12 @@ export class Costs {
     }
 
     /**
-     * Create a new set of icon labels to display the owned currencies and costs amount.
+     * Create a new set of icon label to display the owned currencies and costs amount.
      * @param {HTMLElement} parent The parent to append the icon labels.
      * @param {Function} [multiplierFunction] Optional function that returns a number to multiply the cost. Defaults to 1.
-     * @returns {Set.<Icon_Label>} The new set of icon labels.
+     * @returns {Set.<Icon_Label>} The new set of icon label.
      */
-    createOwnedCostsLabel(parent, multiplierFunction = () => { return 1;}) {
+    createOwnedCostLabels(parent, multiplierFunction = () => { return 1;}) {
         removeChildren(parent);
         const labels = new Set();
         this.costs.forEach((cost) => {
@@ -50,12 +50,12 @@ export class Costs {
     }
 
     /**
-     * Create a new set of icon labels to display the costs amount.
+     * Create a new set of icon label to display the costs amount.
      * @param {HTMLElement} parent The parent to append the icon labels.
      * @param {Function} [multiplierFunction] Optional function that returns a number to multiply the cost. Defaults to 1.
-     * @returns {Set.<Icon_Label>} The new set of icon labels.
+     * @returns {Set.<Icon_Label>} The new set of icon label.
      */
-    createCostsLabel(parent, multiplierFunction = () => { return 1;}) {
+    createCostLabels(parent, multiplierFunction = () => { return 1;}) {
         removeChildren(parent);
         const labels = new Set();
         this.costs.forEach((cost) => {

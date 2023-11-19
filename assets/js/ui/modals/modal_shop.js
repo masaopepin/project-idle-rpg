@@ -36,7 +36,7 @@ export class Modal_Shop extends Modal_Generic {
 
 
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
-        this.costsLabel = new Set();
+        this.costLabels = new Set();
         this.costsRoot = createGenericElement(root, {className: "col-12 col-sm-6"});
 
         this.inputs = new Input_Range_Number(this.modalBody);
@@ -65,7 +65,7 @@ export class Modal_Shop extends Modal_Generic {
         for (const [multiplier, value] of Object.entries(item.multipliers)) {
 
         }
-        this.costsLabel = costs.createOwnedCostsLabel(this.costsRoot, () => { return this.inputs.value; });
+        this.costLabels = costs.createOwnedCostLabels(this.costsRoot, () => { return this.inputs.value; });
         this.updateInputValue(1);
         this.buyButton.onclick = () => { shopItem.buyItem(this.game, this.inputs.value); };
     }
@@ -97,9 +97,9 @@ export class Modal_Shop extends Modal_Generic {
         this.inputs.updateMax(max);
     }
 
-    /** Update the costs label. */
+    /** Update the cost labels. */
     updateCosts() {
-        this.costsLabel.forEach((costLabel) => {
+        this.costLabels.forEach((costLabel) => {
             costLabel.update();
         });
     }

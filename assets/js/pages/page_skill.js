@@ -67,6 +67,7 @@ export class Page_Skill extends Page {
         document.addEventListener("itemRemoved", (e) => { this.itemRemoved(e); }, {signal: this.abortController.signal});
         document.addEventListener("multipliersApplied", (e) => { this.multipliersApplied(e); }, {signal: this.abortController.signal});
         document.addEventListener("actionStarted", (e) => { this.actionStarted(e); }, {signal: this.abortController.signal});
+        document.addEventListener("actionEnded", (e) => { this.actionEnded(e); }, {signal: this.abortController.signal});
         document.addEventListener("actionStopped", (e) => { this.actionStopped(e); }, {signal: this.abortController.signal});
     }
 
@@ -75,6 +76,9 @@ export class Page_Skill extends Page {
         this.activeSections.forEach((section) => {
             section.actionProgress.update(section.action.elapsedTime, section.action.duration, section.action.elapsedPercent);
         });
+        if (this.modalCrafting !== null) {
+            this.modalCrafting.actionRow.updateProgress();
+        }
     }
 
     exit() {
@@ -158,9 +162,25 @@ export class Page_Skill extends Page {
         }
     }
 
+    actionEnded(e) {
+        /** @type {import("../events/manager_event.js").actionEnded} */
+        const eventData = e.eventData;
+        if (this.modalCrafting !== null && eventData.action === this.modalCrafting.actionRow.action) {
+            this.modalCrafting.actionRow.update();
+        }
+    }
+
     actionStopped(e) {
         /** @type {import("../events/manager_event.js").actionStopped} */
         const eventData = e.eventData;
+        if (eventData.action.craftingRecipe !== undefined && this.modalCrafting !== null && eventData.action === this.modalCrafting.actionRow.action) {
+            if (this.modalCrafting !== null) {
+                this.modalCrafting.actionRow.row.classList.add("d-none");
+                this.modalCrafting.inputs.root.classList.remove("d-none");
+                this.modalCrafting.actionButton.classList.remove("d-none");
+                this.modalCrafting.updateInput(this.modalCrafting.craftingRecipe.costs.getMaxAmount());
+            }
+        }
         if (eventData.action.oldGatheringNode === undefined) {
             return;
         }
@@ -196,14 +216,14 @@ export class Page_Skill extends Page {
         const root = createGenericElement(parent, {className: "col-12 col-sm-6 col-md-4"});
         const border = createGenericElement(root, {className: "d-flex flex-column section bg-dark border-3 w-100 h-100 p-0 m-0 shadow-lg"});
 
-        const button = createGenericButton(border, {className: "btn btn-primary rounded-top rounded-bottom-0 w-100"}, {onclick: () => { this.skill.startGathering(gatheringNode); }});
+        const button = createGenericButton(border, {className: "btn btn-primary rounded-top rounded-bottom-0 p-0 w-100"}, {onclick: () => { this.skill.startGathering(gatheringNode); }});
         createGenericElement(button, {innerHTML: actionName});
         createGenericElement(button, {innerHTML: nodeName});
         
         const conditionsDiv = createGenericElement(border, {className: "d-flex bg-dark w-100 p-1"});
         const conditions = createGenericElement(conditionsDiv, {className: "mx-auto", innerHTML: gatheringNode.conditions.getConditionsString()});
-        const rewardsRoot = createGenericElement(border, {className: "bg-dark w-100 p-1 mt-auto mb-0"});
-        const rewards = gatheringNode.rewards.createRewardsLabel(rewardsRoot);
+        const rewardsRoot = createGenericElement(border, {className: "bg-dark w-100 px-2 mt-auto mb-0"});
+        const rewards = gatheringNode.rewards.createRewardLabels(rewardsRoot);
 
         /** @type {Gathering_Section} */
         const section = {

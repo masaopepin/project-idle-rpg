@@ -8,7 +8,7 @@ export class Progressbar {
      */
     constructor(parent, name) {
         /** The root element of the bar. */
-        this.root = createGenericElement(parent, {className: "col-12 my-2"});
+        this.root = createGenericElement(parent, {className: "p-1 my-1"});
         /** The bar background. */
         this.bar = createGenericElement(this.root, {className: "progress", attributes: {"role": "progressbar", "aria-label": name, "aria-valuemin": "0"}});
         /** The bar filling. */

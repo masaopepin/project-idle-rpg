@@ -9,6 +9,7 @@ import { createGenericElement } from "../helpers/helpers_html.js";
 import { Nav_Button } from "../ui/buttons/nav_button.js";
 import { Icon_Label } from "../ui/labels/icon_label.js";
 import { Toast_Reward } from "../ui/toasts/toast_reward.js";
+import { Modal_Confirm } from "../ui/modals/modal_confirm.js";
 
 /** Manager class for all "pages" in the game. Handles switching and updating pages. */
 export class Manager_Page {
@@ -25,6 +26,7 @@ export class Manager_Page {
         const modalRoot = document.getElementById("modal-root");
         /** The root element for all modals. */
         this.modalRoot = modalRoot === null ? createGenericElement(document.body) : modalRoot;
+        this.modalConfirm = new Modal_Confirm(this.modalRoot);
         
         /** 
          * Database containing all pages.
@@ -46,15 +48,15 @@ export class Manager_Page {
 
         // Bottom toast
         /** @type {Set.<Toast_Reward>} */
-        this.activeRewardToasts = new Set();
+        //this.activeRewardToasts = new Set();
         /** @type {Set.<Toast_Reward>} */
-        this.inactiveRewardToasts = new Set();
+        /**this.inactiveRewardToasts = new Set();
         this.bottomToastContainer = document.getElementById("bottom-toast-container");
         this.maxToast = 6;
         this.maxToastDelay = 5000;
         for (let i = 0; i < this.maxToast; i++) {
             this.inactiveRewardToasts.add(new Toast_Reward(this.bottomToastContainer, this.maxToastDelay));
-        }
+        }*/
 
         // Create the money label
         const money = document.getElementById("money");
@@ -97,13 +99,13 @@ export class Manager_Page {
         this.skillToggle.innerHTML = this.game.languages.getString("skills");
         this.moreToggle.innerHTML = this.game.languages.getString("more");
 
-        const xpString = this.game.languages.getString("xp");
+        /*const xpString = this.game.languages.getString("xp");
         for (const toast of this.activeRewardToasts) {
             toast.xpString = xpString;
         }
         for (const toast of this.inactiveRewardToasts) {
             toast.xpString = xpString;
-        }
+        }*/
 
         for (const button of this.navButtons) {
             button.iconLabel.label.innerHTML = this.game.languages.getString(button.stringId);
@@ -130,7 +132,7 @@ export class Manager_Page {
                 this.moneyLabel.update();
             }
         }
-        this.createItemToast(eventData.slot.item, eventData.amount);
+        //this.createItemToast(eventData.slot.item, eventData.amount);
     }
 
     itemRemoved(e) {
@@ -142,13 +144,13 @@ export class Manager_Page {
                 this.moneyLabel.update();
             }
         }
-        this.createItemToast(eventData.slot.item, eventData.amount * -1);
+        //this.createItemToast(eventData.slot.item, eventData.amount * -1);
     }
 
     xpAdded(e) {
         /** @type {import("../events/manager_event.js").xpAdded} */
         const eventData = e.eventData;
-        this.createSkillToast(eventData.skill, eventData.amount);
+        //this.createSkillToast(eventData.skill, eventData.amount);
     }
 
     /**
@@ -156,20 +158,21 @@ export class Manager_Page {
      * @param {number} deltaTime Milliseconds since last update.
      */
     update(deltaTime) {
-        for (const activeToast of this.activeRewardToasts) {
+        /*for (const activeToast of this.activeRewardToasts) {
             activeToast.timer += deltaTime;
             if (activeToast.timer >= activeToast.maxDelay) {
                 activeToast.hide();
                 this.activeRewardToasts.delete(activeToast);
                 this.inactiveRewardToasts.add(activeToast);
             }
-        }
+        }*/
 
         if (this.currentPage !== null) {
             this.currentPage.update();
         }
     }
 
+    /** Enter or exit fullscreen mode if possible. */
     toggleFullscreen() {
         // Exit
         if (document.fullscreenElement) {

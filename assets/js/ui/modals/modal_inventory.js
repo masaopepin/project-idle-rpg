@@ -30,7 +30,7 @@ export class Modal_Inventory extends Modal_Generic {
         this.multipliersRoot = createGenericElement(root, {className: "col-12"});
 
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
-        this.rewardsLabel = new Set();
+        this.rewardLabels = new Set();
         this.rewardsRoot = createGenericElement(root, {className: "col-12 my-1"});
 
         this.inputs = new Input_Range_Number(this.modalBody);
@@ -63,7 +63,7 @@ export class Modal_Inventory extends Modal_Generic {
         }
         this.updateInputValue(1);
 
-        this.rewardsLabel = new Rewards(this.game, item.sellData).createRewardsLabel(this.rewardsRoot, () => { return this.inputs.value; });
+        this.rewardLabels = new Rewards(this.game, item.sellData).createRewardLabels(this.rewardsRoot, () => { return this.inputs.value; });
 
         // Equip button
         const equipmentSlot = this.game.equipments.getEquipmentSlot(item.typeId);
@@ -112,9 +112,9 @@ export class Modal_Inventory extends Modal_Generic {
         this.inputs.updateMax(max);
     }
 
-    /** Update the rewards label. */
+    /** Update the reward labels. */
     updateRewards() {
-        this.rewardsLabel.forEach((rewardLabel) => {
+        this.rewardLabels.forEach((rewardLabel) => {
             rewardLabel.update();
         });
     }
