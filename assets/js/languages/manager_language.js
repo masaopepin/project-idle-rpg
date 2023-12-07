@@ -4,7 +4,7 @@ export class Manager_Language {
     constructor(game) {
         /** Boolean set to true when the language is fully loaded. */
         this.isLanguageLoaded = false;
-        /** The array of possible languages. */
+        /** The array of valid languages. */
         this.languages = ["en", "fr"];
         /** 
          * Database of all strings for the current language.
@@ -41,6 +41,7 @@ export class Manager_Language {
         this.isLanguageLoaded = false;
         import("./language_" + game.settings.language + ".js").then((language) => {
             this.db = language["LANGUAGE_" + game.settings.language.toUpperCase()];
+            document.documentElement.setAttribute("lang", game.settings.language);
             console.log("Language loaded: " + game.settings.language);
             this.isLanguageLoaded = true;
             game.events.dispatch("languageLoaded", {language: game.settings.language});

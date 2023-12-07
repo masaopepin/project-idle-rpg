@@ -7,6 +7,7 @@ import { save } from "./save_game.js";
  * @prop {import("../items/manager_equipment.js").EquipmentSave[]} equipments
  * @prop {import("../skills/skill.js").SkillSave[]} skills
  * @prop {import("../actions/action.js").ActionSave[]} actions
+ * @prop {import("../upgrades/upgrade.js").UpgradeSave[]} upgrades
  * @prop {import("../shops/shop.js").ShopSave[]} shops
  */
 
@@ -36,6 +37,9 @@ export class Player {
         if (obj.actions !== undefined) {
             game.actions.load(obj.actions);
         }
+        if (obj.upgrades !== undefined) {
+            game.upgrades.load(obj.upgrades);
+        }
         if (obj.shops !== undefined) {
             game.shops.load(obj.shops);
         }
@@ -52,6 +56,7 @@ export class Player {
             equipments: game.equipments.save(),
             skills: game.skills.save(),
             actions: game.actions.save(),
+            upgrades: game.upgrades.save(),
             shops: game.shops.save(),
         };
         save("Player", playerSave);

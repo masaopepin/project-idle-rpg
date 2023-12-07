@@ -9,12 +9,12 @@ export function timeToString(time) {
     const hours = Math.floor(minutes / 60);
 
     if (hours >= 1) {
-        return hours + " hrs " + (minutes - hours * 60) + " mins";
+        return hours + " hr " + (minutes - hours * 60) + " min";
     }
     if (minutes >= 1) {
-        return minutes + " mins " + Math.floor(seconds - minutes * 60) + " secs";
+        return minutes + " min " + Math.floor(seconds - minutes * 60) + " sec";
     }
-    return seconds.toFixed(2) + " secs";
+    return seconds.toFixed(2) + " sec";
 }
 
 /**

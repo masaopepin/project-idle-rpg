@@ -19,10 +19,10 @@ export class Dropdown_Generic {
      */
     constructor(parent, id, dropdownData = {}) {
         /** The dropdown root element. */
-        this.root = createGenericElement(parent, {className: dropdownData.className === undefined ? "dropdown" : "dropdown " + dropdownData.className});
+        this.root = createGenericElement(parent, {className: dropdownData.className === undefined ? "dropdown-center" : "dropdown-center " + dropdownData.className});
         /** The dropdown toggle element. */
         this.toggle = createGenericButton(this.root, {
-            className: "btn btn-dark dropdown-toggle w-100",
+            className: "btn btn-body dropdown-toggle w-100",
             innerHTML: dropdownData.innerHTML === undefined ? "" : dropdownData.innerHTML,
             attributes: {"id": id, "data-bs-toggle": "dropdown", "aria-expanded": "false"}
         });
@@ -35,6 +35,11 @@ export class Dropdown_Generic {
          * @type {Set.<HTMLElement>}
          */
         this.items = new Set();
+        /**
+         * Object that associate string to string id.
+         * @type {Object.<string, string>}
+         */
+        this.stringsId = {};
         /** The currently active dropdown item element. */
         this.activeItem = null;
         this.createItems(dropdownData);
@@ -67,6 +72,49 @@ export class Dropdown_Generic {
     }
 
     /**
+     * Create the dropdown items from an array of string id and a given dropdown data.
+     * @param {import("../../main.js").Game_Instance} game The game instance.
+     * @param {string[]} stringsId The array of string id to create the dropdown items.
+     * @param {DropdownData} dropdownData An object containing info about the dropdown.
+     */
+    createItemsFromStringsId(game, stringsId, dropdownData) {
+        this.stringsId = {};
+        stringsId.forEach((stringId) => {
+            const translatedString = game.languages.getString(stringId);
+            this.stringsId[translatedString] = stringId;
+            if (dropdownData.activeItem === stringId) {
+                dropdownData.activeItem = translatedString;
+            }
+        });
+        dropdownData.itemList = Object.keys(this.stringsId);
+        this.createItems(dropdownData);
+    }
+
+    /** @returns The unique id of the active item string or an empty string if not found. */
+    getActiveItemId() {
+        if (this.activeItem !== null) {
+            const stringId = this.stringsId[this.activeItem.innerHTML];
+            if (stringId !== undefined) {
+                return stringId;
+            }
+        }
+        return "";
+    }
+
+    /**
+     * Get the string id of the given item if found.
+     * @param {HTMLElement} item The item element to get the string id.
+     * @returns The unique id of the item or an empty string if not found.
+     */
+    getItemStringId(item) {
+        const stringId = this.stringsId[item.innerHTML];
+        if (stringId !== undefined) {
+            return stringId;
+        }
+        return "";
+    }
+
+    /**
      * Set the active item of the dropdown.
      * @param {string} itemName The name of the new active item.
      */
@@ -74,7 +122,7 @@ export class Dropdown_Generic {
         for (const item of this.items) {
             if (item.innerHTML === itemName) {
                 this.setActiveItem(item);
-                break;
+                return;
             }
         }
     }

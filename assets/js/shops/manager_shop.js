@@ -12,7 +12,7 @@ export class Manager_Shop {
          * @type {Set.<Shop>}
          */
         this.shops = new Set();
-        SHOP_TOOLS.forEach((shopData) => { this.shops.add(new Shop(game, shopData)); });
+        SHOP_TOOLS.forEach((shopData) => { this.shops.add(new Shop(shopData)); });
     }
 
     /**

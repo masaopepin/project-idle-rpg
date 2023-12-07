@@ -1,5 +1,3 @@
-import { Conditions } from "../misc/condition.js";
-
 /**
  * @typedef EquipmentSave
  * @prop {string} id The unique id of the equipment slot.
@@ -27,10 +25,7 @@ export class EquipmentSlot {
      */
     equip(game, inventorySlot) {
         const item = inventorySlot.item;
-        if (!new Conditions(game, item.conditionsData).checkConditions()) {
-            return;
-        }
-        if (!this.canEquip(game)) {
+        if (!game.createConditions(item.conditionsData).checkConditions() || !this.canEquip(game)) {
             return;
         }
         // Unequip the item in the slot first if any.

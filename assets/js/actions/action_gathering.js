@@ -10,8 +10,6 @@ export class Action_Gathering extends Action {
         super(game);
         /** The gathering node associated with the action. */
         this.gatheringNode = game.errors.gatheringNode;
-        /** The last node that was stopped. */
-        this.oldGatheringNode = game.errors.gatheringNode;
     }
 
     get duration() {
@@ -58,21 +56,13 @@ export class Action_Gathering extends Action {
             console.log("Failed to start gathering action because the action data is invalid.");
             return;
         }
-        const isActionActive = this.game.actions.activeActions.has(this);
-        if (isActionActive && actionData.gatheringNode.id === this.gatheringNode.id) {
-            this.stop();
-            return;
-        }
-        if (this.game.inventory.isFull) {
-            console.log("Failed to start gathering action because the inventory is full.");
+        const activeAction = this.game.actions.getGatheringAction(actionData.gatheringNode.id);
+        if (activeAction !== null) {
+            activeAction.stop();
             return;
         }
         if (!this.canStart(actionData)) {
-            console.log("Failed to start gathering action because the conditions failed.");
             return;
-        }
-        if (isActionActive) {
-            this.stop();
         }
 
         this.setAction(actionData);
@@ -92,13 +82,22 @@ export class Action_Gathering extends Action {
     }
 
     stop() {
-        this.oldGatheringNode = this.gatheringNode;
-        this.gatheringNode = this.game.errors.gatheringNode;
-        this.removeAction();
+        super.stop();
     }
 
     /** @param {import("./action.js").ActionData} actionData An object containing info about the action. */
     canStart(actionData) {
-        return actionData.gatheringNode.conditions.checkConditions();
+        if (!super.canStart(actionData)) {
+            return false;
+        }
+        if (this.game.inventory.isFull) {
+            this.game.pages.createFailureToast(this.game.languages.getString("error_inventoryFull"));
+            return false;
+        }
+        if (!actionData.gatheringNode.conditions.checkConditions()) {
+            this.game.pages.createFailureToast(this.game.languages.getString("error_conditionsFailed"));
+            return false;
+        }
+        return true;
     }
 }

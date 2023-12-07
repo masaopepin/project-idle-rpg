@@ -1,7 +1,5 @@
-import { Item } from "../items/item.js";
-import { Costs } from "../misc/cost.js";
-import { Conditions } from "../misc/condition.js";
-import { Rewards } from "../misc/reward.js";
+import { Icon_Label } from "../ui/labels/icon_label.js";
+import { createGenericElement, createOpenModalButton } from "../helpers/helpers_html.js";
 
 /**
  * @typedef CraftingRecipeData
@@ -24,16 +22,48 @@ export class Crafting_Recipe {
         /** The skill associated with the recipe. */
         this.skill = skill;
         /** The item crafted by the recipe. */
-        this.item = recipeData.id === undefined ? new Item() : game.items.getItem(recipeData.id);
+        this.item = recipeData.id === undefined ? game.createItem() : game.items.getItem(recipeData.id);
         /** The unique id of the crafting action. */
         this.actionId = recipeData.actionId === undefined ? "error" : recipeData.actionId;
         /** The time in milliseconds it takes to complete an action without multipliers applied. */
         this.baseDuration = recipeData.duration === undefined ? 0 : recipeData.duration;
         /** The costs required per action. */
-        this.costs = recipeData.costsData === undefined ? new Costs(game) : new Costs(game, recipeData.costsData);
+        this.costs = recipeData.costsData === undefined ? game.createCosts() : game.createCosts(recipeData.costsData);
         /** The conditions required to start the action. */
-        this.conditions = recipeData.conditionsData === undefined ? new Conditions(game) : new Conditions(game, recipeData.conditionsData);
+        this.conditions = recipeData.conditionsData === undefined ? game.createConditions() : game.createConditions(recipeData.conditionsData);
         /** The rewards to give at the end of each action. */
-        this.rewards = recipeData.rewardsData === undefined ? new Rewards(game) : new Rewards(game, recipeData.rewardsData);
+        this.rewards = recipeData.rewardsData === undefined ? game.createRewards() : game.createRewards(recipeData.rewardsData);
+    }
+
+    /**
+     * Start a crafting action for the recipe.
+     * @param {number} amount The number of crafting loops.
+     */
+    startCrafting(amount) {
+        this.skill.startCrafting(this, amount);
+    }
+
+    /**
+     * Create a button to open the crafting modal for the recipe.
+     * @param {HTMLElement} parent The parent to append the button.
+     * @param {import("../ui/modals/modal_crafting.js").Modal_Crafting} modal The modal to open on click.
+     * @returns The icon label inside the button.
+     */
+    createButton(parent, modal) {
+        const root = createGenericElement(parent, {className: "col-12 col-md-6"});
+        const modalButton = createOpenModalButton(root, {className: "btn btn-body w-100"}, {id: "#modal-crafting", onclick: () => { modal.update(this); }});
+        const label = new Icon_Label(modalButton, {
+            source: this.item.icon,
+            updateFunction: () => {
+                const conditionsString = this.conditions.getConditionsString();
+                if (conditionsString === "") {
+                    modalButton.disabled = false;
+                    return this.item.name;
+                }
+                modalButton.disabled = true;
+                return conditionsString;
+            }
+        });
+        return label;
     }
 }

@@ -19,25 +19,29 @@ export class Modal_Crafting extends Modal_Generic {
         this.game = game;
         this.craftingRecipe = game.errors.craftingRecipe;
         this.quantityString = game.languages.getString("quantity") + " ";
-        this.inventoryFullString = game.languages.getString("inventoryFull");
+        this.inventoryFullString = game.languages.getString("error_inventoryFull");
         this.actionString = "";
  
-        const root = createGenericElement(this.modalBody, {className: "row"});
-        this.description = createGenericElement(root, {className: "col-12 mb-2"});
+        this.description = createGenericElement(this.modalBody);
 
+        // Costs
+        const costRewardRow = createGenericElement(this.modalBody, {className: "row"});
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
         this.costLabels = new Set();
-        this.costsRoot = createGenericElement(root, {className: "col-12 col-sm-6"});
+        this.costsRoot = this.createCostSection(game, costRewardRow);
 
+        // Rewards
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
         this.rewardLabels = new Set();
-        const rewardsDiv = createGenericElement(root, {className: "col-12 col-sm-6"});
-        this.rewardsRoot = createGenericElement(rewardsDiv);
-        this.durationLabel = new Duration_Label(game, rewardsDiv, {skill: skill});
+        const rewardSection = this.createRewardSection(game, costRewardRow);
+        this.rewardsRoot = createGenericElement(rewardSection);
+        this.durationLabel = new Duration_Label(game, rewardSection, {skill: skill});
         
-        this.actionRow = new Action_Row(game, this.modalFooter, game.errors.action, game.languages.getString("stop"));
-        this.actionRow.row.classList.add("w-100");
+        // Action row
+        this.actionRow = new Action_Row(game, this.modalFooter, null, game.languages.getString("stop"));
+        this.actionRow.row.classList.add("w-100", "mt-0");
 
+        // Inputs
         this.inputs = new Input_Range_Number(this.modalBody);
         this.inputs.inputRange.oninput = () => { this.updateInput(this.inputs.inputRange.value); };
         this.inputs.inputNumber.oninput = () => { this.updateInput(this.inputs.inputNumber.value); };
@@ -47,10 +51,9 @@ export class Modal_Crafting extends Modal_Generic {
 
     /**
      * Update the crafting modal with a given crafting recipe.
-     * @param {import("../../main.js").Game_Instance} game The game instance.
      * @param {import("../../skills/crafting_recipe.js").Crafting_Recipe} recipe The crafting recipe to associate with the modal.
      */
-    update(game, recipe) {
+    update(recipe) {
         this.craftingRecipe = recipe;
         this.actionString = this.game.languages.getString(recipe.actionId);
         this.modalTitle.innerHTML = recipe.item.name;
@@ -58,24 +61,17 @@ export class Modal_Crafting extends Modal_Generic {
         this.inputs.setNameAttribute(this.quantityString + recipe.item.name);
 
         this.durationLabel.baseDuration = recipe.baseDuration;
-        const action = game.actions.getAction(recipe.actionId);
-        if (action === game.errors.action) {
-            this.actionRow.row.classList.add("d-none");
-            this.inputs.root.classList.remove("d-none");
-            this.actionButton.classList.remove("d-none");
-            this.updateInput(recipe.costs.getMaxAmount());
+        const action = this.game.actions.getCraftingAction(recipe.item.id);
+        if (action === null) {
+            this.hideActionRow();
         }
         else {
-            this.actionRow.row.classList.remove("d-none");
-            this.inputs.root.classList.add("d-none");
-            this.actionButton.classList.add("d-none");
-            this.actionRow.setAction(game, action);
-            this.updateInput(1);
+            this.showActionRow(action);
         }
 
         this.costLabels = recipe.costs.createOwnedCostLabels(this.costsRoot, () => { return this.inputs.value; });
         this.rewardLabels = recipe.rewards.createRewardLabels(this.rewardsRoot, () => { return this.inputs.value; });
-        this.actionButton.onclick = () => { recipe.skill.startCrafting(recipe, this.inputs.value); };
+        this.actionButton.onclick = () => { this.craftingRecipe.startCrafting(this.inputs.value); };
     }
 
     /**
@@ -89,7 +85,7 @@ export class Modal_Crafting extends Modal_Generic {
         this.updateRewards();
     }
 
-    /** Update the maximum value of the inputs and action button. */
+    /** Update the maximum value of the inputs and the action button. */
     updateMax() {
         let max = 0;
         if (this.game.inventory.isFull) {
@@ -112,5 +108,25 @@ export class Modal_Crafting extends Modal_Generic {
     updateRewards() {
         this.rewardLabels.forEach((rewardLabel) => { rewardLabel.update(); });
         this.durationLabel.update(this.inputs.value);
+    }
+
+    /**
+     * Show the action row and hide the inputs.
+     * @param {import("../../actions/action.js").Action} action The action to associate with the row.
+     */
+    showActionRow(action) {
+        this.actionRow.row.classList.remove("d-none");
+        this.inputs.root.classList.add("d-none");
+        this.actionButton.classList.add("d-none");
+        this.actionRow.setAction(this.game, action);
+        this.updateInput(1);
+    }
+
+    /** Hide the action row and show the inputs. */
+    hideActionRow() {
+        this.actionRow.row.classList.add("d-none");
+        this.inputs.root.classList.remove("d-none");
+        this.actionButton.classList.remove("d-none");
+        this.updateInput(this.craftingRecipe.costs.getMaxAmount());
     }
 }

@@ -1,12 +1,12 @@
 # Project Idle RPG
 #### Video Demo:  <URL HERE>
 #### Description:
-My final project for the CS50x course is an idle game made with JavaScript, HTML and CSS. I started working on this project on October 1, 2023 and been working on it for around 5 days a week since then. It is the cumulative work of over 300 hours of coding and drawing. I used JSDoc syntax to comment and to help IntelliSense provide me with appropriate auto-complete suggestions while writing the code. All the icons in the [assets/icons](assets/icons/) folder were made by me using the GIMP 2.10.34 software. The game can be played entirely locally using the Live Server extension of VS Code or with other similar ways of starting a local server.
+My final project for the CS50x course is an idle game made with JavaScript, HTML and CSS. I started working on this project on October 1, 2023 and been working on it for around 5 days a week since then. It is the cumulative work of over 400 hours of coding and drawing. I used JSDoc syntax to comment and to help IntelliSense provide me with appropriate auto-complete suggestions while writing the code. All the icons in the [assets/icons](assets/icons/) folder were made by me using the GIMP 2.10.34 software. The game can be played entirely locally using the Live Server extension of VS Code or with other similar ways of starting a local server.
 
 The main game loop is simple:
 <details><summary>Gather</summary>
 
-    Use one of the gathering skills (Fishing, Mining or Woodcutting) to collect resources that can be sold, used in crafting recipes or used to purchase upgrades.
+***Use one of the gathering skills (Fishing, Mining or Woodcutting) to collect resources that can be sold, used in crafting recipes or used to purchase upgrades.***
 
 - To start gathering, choose one of the gathering skills from the navigation bar, then click on the gathering node button you want to start.
 - Each node can have conditions that must be met before being able to gather from the node. These conditions will appear below the node button when they fail.
@@ -14,7 +14,7 @@ The main game loop is simple:
 </details>
 <details><summary>Craft</summary>
 
-    Use one of the crafting skills (Cooking, Smithing, Carpentering) to turn resources into materials that can be sold or used to purchase upgrades.
+***Use one of the crafting skills (Cooking, Smithing, Carpentering) to turn resources into materials that can be sold or used to purchase upgrades.***
 
 - To start crafting, choose one of the crafting skills from the navigation bar, then click on a crafting recipe button to open the crafting modal. Select the number of time to repeat the recipe, then click the action button.
 - Each recipe can have conditions that must be met before being able to craft the recipe. These conditions will appear on the recipe button instead of the recipe name when they fail.
@@ -23,7 +23,7 @@ The main game loop is simple:
 </details>
 <details><summary>Upgrade</summary>
 
-    Use your hard-earned money, resources and materials to purchase upgrades that will enhance your character.
+***Use your hard-earned money, resources and materials to purchase upgrades that will enhance your character.***
 
 - To upgrade, choose the shop from the navigation bar, then click on a buy button to open the shop modal. Select the amount to purchase, then click the buy button.
 - Each upgrade can have conditions that must be met before being able to buy the upgrade. These conditions will appear above the buy button when they fail.
@@ -44,8 +44,8 @@ Here is an overview of what each file in the project does. For more detailed inf
 <details><summary>Actions</summary>
 
 - [action.js](assets/js/actions/action.js): Base class for actions that have a duration.
-  - [action_crafting.js](assets/js/actions/action_crafting.js): Action started when crafting a [recipe](assets/js/skills/crafting_recipe.js). The player must have enough currency for the [costs](assets/js/cost.js) and pass the [conditions](assets/js/condition.js).
-  - [action_gathering.js](assets/js/actions/action_gathering.js): Action started when gathering a [node](assets/js/skills/gathering_node.js). The player must pass the [conditions](assets/js/condition.js).
+  - [action_crafting.js](assets/js/actions/action_crafting.js): Action started when crafting a [recipe](assets/js/skills/crafting_recipe.js). The player must have enough currency for the [costs](assets/js/misc/cost.js) and meet the [conditions](assets/js/misc/condition.js).
+  - [action_gathering.js](assets/js/actions/action_gathering.js): Action started when gathering a [node](assets/js/skills/gathering_node.js). The player must meet the [conditions](assets/js/misc/condition.js).
 - [manager_action.js](assets/js/actions/manager_action.js): Creates and updates the active [actions](assets/js/actions/action.js).
 
 </details>
@@ -89,7 +89,7 @@ Here is an overview of what each file in the project does. For more detailed inf
 <details><summary>Misc</summary>
 
 - [condition.js](assets/js/misc/condition.js) Class for conditions that must be met before doing something.
-- [cost.js](assets/js/misc/cost.js) Class for costs required to buy or craft.
+- [cost.js](assets/js/misc/cost.js) Class for costs required to buy or craft something.
 - [reward.js](assets/js/misc/reward.js) Class for rewards that can be given to the player.
 - [multipliers.js](assets/js/misc/multipliers.js) Class for multipliers that affect the player performance.
 
@@ -98,10 +98,10 @@ Here is an overview of what each file in the project does. For more detailed inf
 <details><summary>Pages</summary>
 
 - [page.js](assets/js/pages/page.js): Base class for HTML pages generated in JavaScript.
-  - [page_summary.js](assets/js/pages/page_summary.js): Default page of the game. Displays the active [actions](assets/js/actions/action.js) and current value of the [multipliers](assets/js/multipliers.js).
+  - [page_summary.js](assets/js/pages/page_summary.js): Default page of the game. Displays the active [actions](assets/js/actions/action.js) and current value of the [multipliers](assets/js/misc/multipliers.js).
   - [page_inventory.js](assets/js/pages/page_inventory.js): Page to interact with the player's [inventory](assets/js/items/manager_inventory.js) and [equipment](assets/js/items/manager_equipment.js). The inventory can be filtered by category, type and names.
   - [page_settings.js](assets/js/pages/page_settings.js): Page with inputs to change the game [settings](assets/js/save/settings.js).
-  - [page_shop.js](assets/js/pages/page_shop.js): Page to purchase upgrades.
+  - [page_shop.js](assets/js/pages/page_shop.js): Page to purchase [items](assets/js/items/item.js).
   - [page_skill.js](assets/js/pages/page_skill.js): Page to interact with a [skill](assets/js/skills/skill.js). Shows the current level, xp and list of [actions](assets/js/actions/action.js).
 - [manager_page.js](assets/js/pages/manager_page.js): Creates and updates the [pages](assets/js/pages/page.js).
 
@@ -118,7 +118,7 @@ Here is an overview of what each file in the project does. For more detailed inf
 <details><summary>Shops</summary>
 
 - [shop.js](assets/js/shops/shop.js): Class constructed from a shop data that represents a shop in the game.
-  - [shop_tools.js](assets/js/shops/shop_tools.js): Contains the shop data for the tools.
+  - [shop_tools.js](assets/js/shops/shop_tools.js): Contains the shop data for the [tools](assets/js/items/tools.js).
 - [manager_shop.js](assets/js/shops/manager_shop.js): Creates and holds the [shops](assets/js/shops/shop.js).
 
 </details>
@@ -149,15 +149,25 @@ Here is an overview of what each file in the project does. For more detailed inf
 - Labels
   - [icon_label.js](assets/js/ui/labels/icon_label.js): Creates an icon with a text on the right that can be updated.
 - [modal_generic.js](assets/js/ui/modals/modal_generic.js): Base class for modals with a header, body and footer.
+  - [modal_confirm.js](assets/js/ui/modals/modal_confirm.js): Modal used to prompt the player with a confirmation message before doing something important.
   - [modal_crafting.js](assets/js/ui/modals/modal_crafting.js): Modal used by [skills](assets/js/skills/skill.js) to start a [crafting action](assets/js/actions/action_crafting.js).
   - [modal_equipment.js](assets/js/ui/modals/modal_equipment.js): Modal used by the [inventory page](assets/js/pages/page_inventory.js) to unequip [items](assets/js/items/item.js).
   - [modal_inventory.js](assets/js/ui/modals/modal_inventory.js): Modal used by the [inventory page](assets/js/pages/page_inventory.js) to equip and sell [items](assets/js/items/item.js).
-  - [modal_shop.js](assets/js/ui/modals/modal_shop.js): Modal used by the [shop page](assets/js/pages/page_shop.js) to buy upgrades.
-- Toasts
-  - [toast_reward.js](assets/js/ui/toasts/toast_reward.js) Creates a toast to notify the player about a [reward](assets/js/reward.js).
+  - [modal_shop.js](assets/js/ui/modals/modal_shop.js): Modal used by the [shop page](assets/js/pages/page_shop.js) to buy [items](assets/js/items/item.js).
+  - [modal_upgrade.js](assets/js/ui/modals/modal_upgrade.js): Modal used to buy [upgrades](assets/js/upgrades/upgrade.js).
+- [toast_generic.js](assets/js/ui/toasts/toast_generic.js): Base class for toasts used to notify the player about something.
+  - [toast_failure.js](assets/js/ui/toasts/toast_failure.js) Creates a toast to notify the player about the failure of something.
+  - [toast_success.js](assets/js/ui/toasts/toast_success.js) Creates a toast to notify the player about the success of something.
 - [action_row.js](assets/js/ui/action_row.js): Creates a row to display the progress of an [action](assets/js/actions/action.js).
 - [item_icon.js](assets/js/ui/item_icon.js): Creates an icon to display an [inventory](assets/js/items/manager_inventory.js) slot or an [equipment](assets/js/items/manager_equipment.js) slot.
-- [progressbar.js](assets/js/ui/progressbar.js): Creates a basic progressbar.
+- [progressbar.js](assets/js/ui/progressbar.js): Creates a basic progressbar with an update function.
+
+</details>
+
+<details><summary>Upgrades</summary>
+
+- [upgrade.js](assets/js/upgrades/upgrade.js): Contains the base class for upgrades and all classes that extends it. They apply different effects based on the current level of the upgrade, which can be bought for a certain [cost](assets/js/misc/cost.js).
+- [manager_upgrade.js](assets/js/upgrades/manager_upgrade.js): Creates and manages the [upgrades](assets/js/upgrades/upgrade.js).
 
 </details>
 

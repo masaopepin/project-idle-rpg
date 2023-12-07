@@ -10,71 +10,71 @@ export class Modal_Shop extends Modal_Generic {
     /**
      * @param {import("../../main.js").Game_Instance} game The game instance.
      * @param {HTMLElement} parent The parent to append the modal.
-     * @param {string} buyString The buy button string in the current language.
      */
-    constructor(game, parent, buyString) {
+    constructor(game, parent) {
         super(parent, "modal-shop", "modal-lg");
         this.game = game;
-        this.costs = game.errors.costs;
         this.shopItem = null;
+        this.item = game.errors.item;
+        this.costs = game.errors.costs;
         this.quantityString = game.languages.getString("quantity") + " ";
-        this.inventoryFullString = game.languages.getString("inventoryFull");
-        this.buyString = buyString;
+        this.inventoryFullString = game.languages.getString("error_inventoryFull");
+        this.buyString = game.languages.getString("buy");
 
-        const root = createGenericElement(this.modalBody, {className: "row"});
-        this.description = createGenericElement(root, {className: "col-12 mb-2"});
+        this.description = createGenericElement(this.modalBody);
 
-        const stockDiv = createGenericElement(root, {className: "d-flex flex-column flex-sm-row"});
+        const stockDiv = createGenericElement(this.modalBody, {className: "d-flex flex-column flex-sm-row"});
         // Stock amount
         const stockAmountDiv = createGenericElement(stockDiv, {className: "d-flex"});
-        createGenericElement(stockAmountDiv, {innerHTML: "In stock :"});
+        createGenericElement(stockAmountDiv, {innerHTML: game.languages.getString("inStock")});
         this.stockAmount = createGenericElement(stockAmountDiv, {className: "ms-1", innerHTML: "0"});
-        // Owned amount
-        const ownedAmountDiv = createGenericElement(stockDiv, {className: "d-flex ms-sm-auto"});
-        createGenericElement(ownedAmountDiv, {innerHTML: "Currently owned :"});
-        this.ownedAmount = createGenericElement(ownedAmountDiv, {className: "ms-1", innerHTML: "0"});
+        // Inventory amount
+        const inventoryAmountDiv = createGenericElement(stockDiv, {className: "d-flex ms-sm-auto"});
+        createGenericElement(inventoryAmountDiv, {innerHTML: game.languages.getString("inInventory")});
+        this.inventoryAmount = createGenericElement(inventoryAmountDiv, {className: "ms-1", innerHTML: "0"});
 
 
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
         this.costLabels = new Set();
-        this.costsRoot = createGenericElement(root, {className: "col-12 col-sm-6"});
+        this.costsRoot = this.createCostSection(game, this.modalBody, false);
 
         this.inputs = new Input_Range_Number(this.modalBody);
-        this.inputs.inputRange.oninput = () => { this.updateInputValue(this.inputs.inputRange.value); };
-        this.inputs.inputNumber.oninput = () => { this.updateInputValue(this.inputs.inputNumber.value); };
+        this.inputs.inputRange.oninput = () => { this.updateInputs(this.inputs.inputRange.value); };
+        this.inputs.inputNumber.oninput = () => { this.updateInputs(this.inputs.inputNumber.value); };
 
-        this.buyButton = createGenericButton(this.modalFooter, {className: "btn btn-success w-100", innerHTML: buyString, attributes: {"data-bs-dismiss": "modal"}});
+        this.buyButton = createGenericButton(this.modalFooter, {className: "btn btn-success w-100", innerHTML: this.buyString, attributes: {"data-bs-dismiss": "modal"}});
     }
 
     /**
-     * Update the shop modal with a given item.
+     * Update the shop modal with a given shop item.
      * @param {import("../../shops/shop.js").ShopItem} shopItem The shop item to associate with the modal.
+     * @param {import("../../items/item.js").Item} item The item to associate with the modal.
      * @param {import("../../misc/cost.js").Costs} costs The costs of the item.
      */
-    update(shopItem, costs) {
+    update(shopItem, item, costs) {
         this.shopItem = shopItem;
+        this.item = item;
         this.costs = costs;
 
-        const item = shopItem.item;
         this.inputs.setNameAttribute(this.quantityString + item.name);
         this.modalTitle.innerHTML = item.name;
         this.description.innerHTML = item.description;
         this.stockAmount.innerHTML = shopItem.stock;
-        this.ownedAmount.innerHTML = item.amount;
+        this.inventoryAmount.innerHTML = item.amount;
 
         for (const [multiplier, value] of Object.entries(item.multipliers)) {
 
         }
         this.costLabels = costs.createOwnedCostLabels(this.costsRoot, () => { return this.inputs.value; });
-        this.updateInputValue(1);
-        this.buyButton.onclick = () => { shopItem.buyItem(this.game, this.inputs.value); };
+        this.updateInputs(1);
+        this.buyButton.onclick = () => { this.shopItem.buy(this.game, this.inputs.value); };
     }
 
     /**
      * Update the inputs and action button.
      * @param {string | number} inputValue The new inputs value string.
      */
-    updateInputValue(inputValue) {
+    updateInputs(inputValue) {
         if (this.shopItem === null) {
             return;
         }
@@ -90,7 +90,7 @@ export class Modal_Shop extends Modal_Generic {
             this.buyButton.innerHTML = this.inventoryFullString;
         }
         else {
-            max = Math.min(this.costs.getMaxAmount(), this.shopItem.item.maxStack, this.shopItem.stock);
+            max = Math.min(this.costs.getMaxAmount(), this.item.maxStack, this.shopItem.stock);
             this.buyButton.innerHTML = this.buyString;
         }
         setButtonDisabled(this.buyButton, max < 1);

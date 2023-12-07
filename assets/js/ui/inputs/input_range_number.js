@@ -10,7 +10,7 @@ export class Input_Range_Number {
      * @param {number} [value] The starting value of the inputs.
      */
     constructor(parent, name = "Quantity", minValue = 1, maxValue = 100, value = 1) {
-        this.root = createGenericElement(parent, {className: "p-1"});
+        this.root = createGenericElement(parent, {className: "inner-section"});
         this.inputRange = createGenericInput(this.root, {className: "form-range", attributes: {"type": "range", "name": name}});
         this.inputNumber = createGenericInput(this.root, {className: "form-control", attributes: {"type": "number", "name": name}});
 

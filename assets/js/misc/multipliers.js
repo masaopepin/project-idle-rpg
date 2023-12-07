@@ -81,6 +81,7 @@ export class Multipliers {
     addMultiplier(multiplierId, amount) {
         if (this.db[multiplierId] !== undefined) {
             this.db[multiplierId] += amount;
+            this.game.events.dispatch("multipliersApplied", null);
         }
     }
 

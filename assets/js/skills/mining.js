@@ -15,7 +15,7 @@ export class Mining extends Skill {
                 {
                     id: "node_copperRock",
                     actionId: "action_mine",
-                    duration: 2000,
+                    duration: 3000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -39,7 +39,7 @@ export class Mining extends Skill {
                 {
                     id: "node_tinRock",
                     actionId: "action_mine",
-                    duration: 2000,
+                    duration: 3000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -63,7 +63,7 @@ export class Mining extends Skill {
                 {
                     id: "node_ironRock",
                     actionId: "action_mine",
-                    duration: 3000,
+                    duration: 4000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -87,7 +87,7 @@ export class Mining extends Skill {
                 {
                     id: "node_coalRock",
                     actionId: "action_mine",
-                    duration: 4000,
+                    duration: 5000,
                     conditionsData: [
                         {
                             type: "skillLevel",

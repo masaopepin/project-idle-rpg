@@ -8,8 +8,9 @@ import { Page_Skill } from "./page_skill.js";
 import { createGenericElement } from "../helpers/helpers_html.js";
 import { Nav_Button } from "../ui/buttons/nav_button.js";
 import { Icon_Label } from "../ui/labels/icon_label.js";
-import { Toast_Reward } from "../ui/toasts/toast_reward.js";
 import { Modal_Confirm } from "../ui/modals/modal_confirm.js";
+import { Toast_Success } from "../ui/toasts/toast_success.js";
+import { Toast_Failure } from "../ui/toasts/toast_failure.js";
 
 /** Manager class for all "pages" in the game. Handles switching and updating pages. */
 export class Manager_Page {
@@ -46,44 +47,31 @@ export class Manager_Page {
         /** @type {Set.<Nav_Button>} */
         this.navButtons = new Set();
 
-        // Bottom toast
-        /** @type {Set.<Toast_Reward>} */
-        //this.activeRewardToasts = new Set();
-        /** @type {Set.<Toast_Reward>} */
-        /**this.inactiveRewardToasts = new Set();
-        this.bottomToastContainer = document.getElementById("bottom-toast-container");
-        this.maxToast = 6;
-        this.maxToastDelay = 5000;
-        for (let i = 0; i < this.maxToast; i++) {
-            this.inactiveRewardToasts.add(new Toast_Reward(this.bottomToastContainer, this.maxToastDelay));
-        }*/
+        const middleToastContainer = document.getElementById("middle-toast-container");
+        this.middleToastContainer = middleToastContainer === null ? createGenericElement(this.gameRoot) : middleToastContainer;
 
         // Create the money label
         const money = document.getElementById("money");
         const moneyItem = this.game.items.getItem("money");
-        if (money !== null) {
-            this.moneyLabel = new Icon_Label(money, {source: moneyItem.icon, updateFunction: () => { return moneyItem.amount; }});
-        }
+        this.moneyLabel = money === null ? new Icon_Label(document.body) : new Icon_Label(money, {source: moneyItem.icon, updateFunction: () => { return moneyItem.amount; }});
 
         // Create the sidebar character buttons
         this.characterToggle = document.getElementById("character-toggle");
         const characterPages = document.getElementById("character-pages");
-        this.navButtons.add(new Nav_Button(characterPages, "./assets/icons/misc/stats.png", "summary", () => { this.switchPage("summary"); }));
-        this.navButtons.add(new Nav_Button(characterPages, "./assets/icons/misc/inventory.png", "inventory", () => { this.switchPage("inventory"); }));
-        this.navButtons.add(new Nav_Button(characterPages, moneyItem.icon, "shop", () => { this.switchPage("shop"); }));
+        this.navButtons.add(new Nav_Button(this.game, characterPages, "summary", {source: "./assets/icons/misc/stats.png"}));
+        this.navButtons.add(new Nav_Button(this.game, characterPages, "inventory", {source: "./assets/icons/misc/inventory.png"}));
+        this.navButtons.add(new Nav_Button(this.game, characterPages, "shop", {source: moneyItem.icon}));
 
         // Create the sidebar skill buttons
         this.skillToggle = document.getElementById("skill-toggle");
         const skillPages = document.getElementById("skill-pages");
-        game.skills.getSkills().forEach((skill) => {
-            this.navButtons.add(new Nav_Button(skillPages, skill.icon, skill.id, () => { this.switchPage(skill.id); }));
-        });
+        game.skills.getSkills().forEach((skill) => { this.navButtons.add(new Nav_Button(this.game, skillPages, skill.id, {source: skill.icon})); });
 
         // Create the sidebar more buttons
         this.moreToggle = document.getElementById("more-toggle");
         const morePages = document.getElementById("more-pages");
-        this.navButtons.add(new Nav_Button(morePages, "./assets/icons/misc/settings.png", "settings", () => { this.switchPage("settings"); }));
-        this.navButtons.add(new Nav_Button(morePages, "", "toggleFullscreen", () => { this.toggleFullscreen(); }));
+        this.navButtons.add(new Nav_Button(this.game, morePages, "settings", {source: "./assets/icons/misc/settings.png"}));
+        this.navButtons.add(new Nav_Button(this.game, morePages, "toggleFullscreen", {iconClass: "bi bi-arrows-fullscreen", onclick: () => { this.toggleFullscreen(); }}));
 
         if (this.game.languages.isLanguageLoaded === true) {
             this.languageLoaded();
@@ -91,7 +79,6 @@ export class Manager_Page {
         document.addEventListener("languageLoaded", (e) => { this.languageLoaded(e); });
         document.addEventListener("itemAdded", (e) => { this.itemAdded(e) });
         document.addEventListener("itemRemoved", (e) => { this.itemRemoved(e) });
-        document.addEventListener("xpAdded", (e) => { this.xpAdded(e) });
     }
 
     languageLoaded(e) {
@@ -99,28 +86,14 @@ export class Manager_Page {
         this.skillToggle.innerHTML = this.game.languages.getString("skills");
         this.moreToggle.innerHTML = this.game.languages.getString("more");
 
-        /*const xpString = this.game.languages.getString("xp");
-        for (const toast of this.activeRewardToasts) {
-            toast.xpString = xpString;
-        }
-        for (const toast of this.inactiveRewardToasts) {
-            toast.xpString = xpString;
-        }*/
-
-        for (const button of this.navButtons) {
-            button.iconLabel.label.innerHTML = this.game.languages.getString(button.stringId);
-        }
-
-        Object.values(this.db).forEach((page) => {
-            page.pageTitle = this.game.languages.getString(page.pageTitleId);
-        });
+        this.navButtons.forEach((button) => { button.update(this.game); });
+        Object.values(this.db).forEach((page) => { page.pageTitle = this.game.languages.getString(page.pageTitleId); });
 
         if (this.currentPage === null) {
             this.goToPage(this.db.summary);
+            return;
         }
-        else {
-            this.updatePageTitle();
-        }
+        this.updatePageTitle();
     }
 
     itemAdded(e) {
@@ -144,13 +117,6 @@ export class Manager_Page {
                 this.moneyLabel.update();
             }
         }
-        //this.createItemToast(eventData.slot.item, eventData.amount * -1);
-    }
-
-    xpAdded(e) {
-        /** @type {import("../events/manager_event.js").xpAdded} */
-        const eventData = e.eventData;
-        //this.createSkillToast(eventData.skill, eventData.amount);
     }
 
     /**
@@ -158,53 +124,8 @@ export class Manager_Page {
      * @param {number} deltaTime Milliseconds since last update.
      */
     update(deltaTime) {
-        /*for (const activeToast of this.activeRewardToasts) {
-            activeToast.timer += deltaTime;
-            if (activeToast.timer >= activeToast.maxDelay) {
-                activeToast.hide();
-                this.activeRewardToasts.delete(activeToast);
-                this.inactiveRewardToasts.add(activeToast);
-            }
-        }*/
-
         if (this.currentPage !== null) {
             this.currentPage.update();
-        }
-    }
-
-    /** Enter or exit fullscreen mode if possible. */
-    toggleFullscreen() {
-        // Exit
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-            return;
-        }
-        else if (document.webkitFullscreenElement) {
-            document.webkitExitFullscreen();
-            return;
-        }
-        else if (document.msFullscreenElement) {
-            document.msExitFullscreen();
-            return;
-        }
-        else if (document.mozFullscreenElement) {
-            document.mozExitFullscreen();
-            return;
-        }
-
-        const elem = document.documentElement;
-        // Enter
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
-        }
-        else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        }
-        else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
-        }
-        else if (elem.mozRequestFullscreen) {
-            elem.mozRequestFullscreen();
         }
     }
 
@@ -241,54 +162,54 @@ export class Manager_Page {
     }
 
     /**
-     * Create a toast at the bottom of the screen to show added and removed items.
-     * @param {import("../items/item.js").Item} item The item to create a toast.
-     * @param {number} amount The number of item added or removed.
+     * Create a new success toast in the middle of the screen.
+     * @param {string} message The success string to display
      */
-    createItemToast(item, amount) {
-        for (const activeToast of this.activeRewardToasts) {
-            if (activeToast.item === item) {
-                activeToast.update(item, null, amount);
-                return;
-            }
-        }
-        for (const inactiveToast of this.inactiveRewardToasts) {
-            inactiveToast.update(item, null, amount);
-            this.inactiveRewardToasts.delete(inactiveToast);
-            this.activeRewardToasts.add(inactiveToast);
-            return;
-        }
-        for (const activeToast of this.activeRewardToasts) {
-            activeToast.update(item, null, amount);
-            this.activeRewardToasts.delete(activeToast);
-            this.activeRewardToasts.add(activeToast);
-            return;
-        }
+    createSuccessToast(message = "") {
+        new Toast_Success(this.middleToastContainer, message).show();
     }
 
     /**
-     * Create a toast at the bottom of the screen to show added xp for skills.
-     * @param {import("../skills/skill.js").Skill} skill The skill to create a toast.
-     * @param {number} amount The number of xp added.
+     * Create a new failure toast in the middle of the screen.
+     * @param {string} message The failure string to display
      */
-    createSkillToast(skill, amount) {
-        for (const activeToast of this.activeRewardToasts) {
-            if (activeToast.skill === skill) {
-                activeToast.update(null, skill, amount);
-                return;
-            }
-        }
-        for (const inactiveToast of this.inactiveRewardToasts) {
-            inactiveToast.update(null, skill, amount);
-            this.inactiveRewardToasts.delete(inactiveToast);
-            this.activeRewardToasts.add(inactiveToast);
+    createFailureToast(message = "") {
+        new Toast_Failure(this.middleToastContainer, message).show();
+    }
+
+    /** Enter or exit fullscreen mode if possible. */
+    toggleFullscreen() {
+        // Exit
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
             return;
         }
-        for (const activeToast of this.activeRewardToasts) {
-            activeToast.update(null, skill, amount);
-            this.activeRewardToasts.delete(activeToast);
-            this.activeRewardToasts.add(activeToast);
+        else if (document.webkitFullscreenElement) {
+            document.webkitExitFullscreen();
             return;
+        }
+        else if (document.msFullscreenElement) {
+            document.msExitFullscreen();
+            return;
+        }
+        else if (document.mozFullscreenElement) {
+            document.mozExitFullscreen();
+            return;
+        }
+
+        const element = document.documentElement;
+        // Enter
+        if (element.requestFullscreen) {
+            element.requestFullscreen();
+        }
+        else if (element.webkitRequestFullscreen) {
+            element.webkitRequestFullscreen();
+        }
+        else if (element.msRequestFullscreen) {
+            element.msRequestFullscreen();
+        }
+        else if (element.mozRequestFullscreen) {
+            element.mozRequestFullscreen();
         }
     }
 }

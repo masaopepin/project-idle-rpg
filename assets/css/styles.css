@@ -1,6 +1,4 @@
 body {
-    background-color: rgb(32, 32, 32);
-    color:white;
     font-size: 18px;
 }
 
@@ -12,6 +10,11 @@ header {
     margin: 0px;
 }
 
+.navbar {
+    border-bottom: 1px solid transparent;
+    border-color: var(--bs-border-color);
+}
+
 .sidebar-header {
     width: 100%;
     font-size: 18px;
@@ -19,23 +22,25 @@ header {
     border-right: 0px;
     border-bottom: 0px;
     border-radius: 0px;
-    border-color: rgb(100, 100, 100);
-    color: white;
+    border-color: var(--bs-border-color);
 }
 
 .sidebar-header:hover {
-    background-color: #424649;
+    background-color: var(--bs-secondary-bg-subtle);
 }
 
 .sidebar-link {
     font-size: 17px;
     padding-left: 10px;
     padding-right: 10px;
-    color: white;
 }
 
 .sidebar-link:hover {
-    background-color: rgb(26, 27, 29);
+    background-color: var(--bs-secondary-bg);
+}
+
+.bi {
+    line-height: 0;
 }
 
 .close-button {
@@ -49,16 +54,32 @@ header {
 }
 
 .section {
-    background-color: #424649;
-    border: 2px solid transparent;
-    border-radius: 10px;
-    border-color: black;
-    margin-top: 10px;
-    color: white;
+    background-color: var(--bs-tertiary-bg);
+    border: 0.15rem solid transparent;
+    border-radius: var(--bs-border-radius-lg);
+    border-color: var(--bs-border-color);
+    margin-top: 1rem;
+    box-shadow: var(--bs-box-shadow);
+}
+
+.inner-section {
+    background-color: var(--bs-tertiary-bg);
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.btn-body {
+    background-color: var(--bs-body-bg);
+    border: none;
+}
+
+.btn-body:hover {
+    background-color: var(--bs-secondary-bg);
 }
 
 .progress-bar {
-    transition-duration: 0.04s;
+    transition-duration: 0.06s;
 }
 
 @media (hover: none) {
@@ -88,7 +109,7 @@ header {
     border-color: goldenrod;
 }
 
-.toast-reward {
+.toast {
     pointer-events: none;
     width: auto;
     margin: auto;

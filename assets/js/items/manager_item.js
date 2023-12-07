@@ -1,4 +1,3 @@
-import { Item } from "./item.js";
 import { CURRENCIES } from "./currencies.js";
 import { FOODS } from "./foods.js";
 import { MATERIALS } from "./materials.js";
@@ -15,7 +14,7 @@ export class Manager_Item {
         this.game = game;
         /** 
          * Database of all item in the game structured as {item.id: Item}.
-         * @type {Object.<string, Item>} 
+         * @type {Object.<string, import("./item.js").Item>} 
          */
         this.db = {};
         /** @type {Object.<string, string[]>} */
@@ -83,7 +82,7 @@ export class Manager_Item {
         }
         itemData.categoryId = categoryId;
         itemData.typeId = typeId;
-        this.db[itemData.id] = new Item(itemData);
+        this.db[itemData.id] = this.game.createItem(itemData);
     }
 
     /**

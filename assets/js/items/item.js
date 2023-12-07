@@ -7,7 +7,6 @@
  * @prop {import("../misc/condition.js").ConditionData[]} [conditionsData] Optional array of condition data required to equip the item.
  * @prop {import("../misc/cost.js").CostData[]} [buyData] Optional array of cost data required to buy the item.
  * @prop {import("../misc/reward.js").RewardData[]} [sellData] Optional array of reward data the player get when selling the item.
- * @prop {string} [nextUpgrade] Optional id of the next item upgrade.
  * @prop {number} [maxStack] Optional max stack of the item. Defaults to 1.
  * @prop {Object.<string, number>} [multipliers] Optional object containing multipliers that this item gives when equipped. 
  */
@@ -43,8 +42,6 @@ export class Item {
         this.buyData = item.buyData === undefined ? [] : item.buyData;
         /** The rewards data the player get when selling the item. */
         this.sellData = item.sellData === undefined ? [] : item.sellData;
-        /** Id of the next item upgrade. */
-        this.nextUpgrade = item.nextUpgrade === undefined ? "" : item.nextUpgrade;
         /** The maximum number of item in a slot. */
         this.maxStack = item.maxStack === undefined ? 999 : item.maxStack;
         /** 
@@ -54,6 +51,38 @@ export class Item {
         this.multipliers = item.multipliers === undefined ? {} : item.multipliers;
         /** The total owned amount of the item. */
         this.amount = 0;
+    }
+
+    /**
+     * Buy a given amount of the item.
+     * @param {import("../main.js").Game_Instance} game The game instance. 
+     * @param {number} amount The number of item to buy.
+     * @returns The number of item bought.
+     */
+    buy(game, amount) {
+        if (game.inventory.isFull) {
+            game.pages.createFailureToast(game.languages.getString("error_inventoryFull"));
+            return 0;
+        }
+        if (isNaN(amount) || amount < 1 || amount > this.maxStack || this.buyData.length === 0) {
+            console.log("Failed to buy item " + this.name + " because the amount is invalid.");
+            return 0;
+        }
+        amount = Math.floor(amount);
+        if (!game.createConditions(this.conditionsData).checkConditions()) {
+            game.pages.createFailureToast(game.languages.getString("error_conditionsFailed"));
+            return 0;
+        }
+        const costs = game.createCosts(this.buyData);
+        if (!costs.checkCurrencies(amount)) {
+            game.pages.createFailureToast(game.languages.getString("error_notEnoughCurrency"));
+            return 0;
+        }
+        
+        game.inventory.addItem(this, amount);
+        costs.removeCurrencies(amount);
+        game.pages.createSuccessToast(game.languages.getString("success_purchaseCompleted"));
+        return amount;
     }
 
     /**

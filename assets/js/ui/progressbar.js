@@ -5,14 +5,15 @@ export class Progressbar {
     /**
      * @param {HTMLElement} parent The parent to append the progressbar.
      * @param {string} name The string to set the aria-label attribute.
+     * @param {string} color The color class to add to the fill.
      */
-    constructor(parent, name) {
+    constructor(parent, name, color) {
         /** The root element of the bar. */
-        this.root = createGenericElement(parent, {className: "p-1 my-1"});
+        this.root = createGenericElement(parent, {className: "p-2"});
         /** The bar background. */
         this.bar = createGenericElement(this.root, {className: "progress", attributes: {"role": "progressbar", "aria-label": name, "aria-valuemin": "0"}});
         /** The bar filling. */
-        this.fill = createGenericElement(this.bar, {className: "progress-bar"});
+        this.fill = createGenericElement(this.bar, {className: color === undefined ? "progress-bar" : "progress-bar " + color});
     }
 
     /**

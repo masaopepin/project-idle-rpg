@@ -1,16 +1,14 @@
-import { Conditions } from "../misc/condition.js";
-import { Rewards } from "../misc/reward.js";
 import { toPercent } from "../helpers/format_string.js";
 
 /**
- * @typedef ActionData Object containing info about the action.
+ * @typedef ActionData
  * @prop {string} id The unique id of the action.
  * @prop {string} type The type of the action. 
  * @prop {number} [duration] Optional time in milliseconds it takes to complete an action.
  * @prop {number} [loop] Optional number of time the action should complete. Defaults to 0 which means loop until stop().
  * @prop {number} [loopCount] Optional number of time the action has completed since last start().
- * @prop {Rewards} [rewards] Optional rewards to give to the player at the end of an action.
- * @prop {Conditions} [conditions] Optional conditions that must be met to start the action.
+ * @prop {import("../misc/reward.js").Rewards} [rewards] Optional rewards to give to the player at the end of an action.
+ * @prop {import("../misc/condition.js").Conditions} [conditions] Optional conditions that must be met to start the action.
  * @prop {import("../skills/gathering_node.js").Gathering_Node} [gatheringNode] Optional gathering node associated with the action.
  * @prop {import("../skills/crafting_recipe.js").Crafting_Recipe} [craftingRecipe] Optional crafting recipe associated with the action.
  */
@@ -48,9 +46,9 @@ export class Action {
         /** Number of time the action has completed since last start(). */
         this.loopCount = 0;
         /** Conditions that must be met to start the action. */
-        this.conditions = new Conditions(game, []);
+        this.conditions = game.errors.conditions;
         /** Rewards to give to the player at the end of an action. */
-        this.rewards = new Rewards(game, []);
+        this.rewards = game.errors.rewards;
     }
 
     /** The duration of the action with speed multipliers applied. */
@@ -100,8 +98,8 @@ export class Action {
         this.baseDuration = actionData.duration === undefined ? 0 : actionData.duration;
         this.loop = actionData.loop === undefined ? 0 : actionData.loop;
         this.loopCount = actionData.loopCount === undefined ? 0 : actionData.loopCount;
-        this.conditions = actionData.conditions === undefined ? new Conditions(this.game, []) : actionData.conditions;
-        this.rewards = actionData.rewards === undefined ? new Rewards(this.game, []) : actionData.rewards;
+        this.conditions = actionData.conditions === undefined ? this.game.errors.conditions : actionData.conditions;
+        this.rewards = actionData.rewards === undefined ? this.game.errors.rewards : actionData.rewards;
     }
 
     /** @returns The string to add to the action name when displaying the action. */
@@ -179,5 +177,18 @@ export class Action {
         this.game.actions.removeAction(this);
         this.loopCount = 0;
         this.game.events.dispatch("actionStopped", {action: this});
+    }
+
+    /**
+     * Check if the action can be started.
+     * @param {ActionData} actionData The action data to check.
+     * @returns True if the action passes all conditions or false if any fails.
+     */
+    canStart(actionData) {
+        if (this.game.actions.isFull) {
+            this.game.pages.createFailureToast(this.game.languages.getString("error_maxActionsReached"));
+            return false;
+        } 
+        return true;
     }
 }

@@ -1,5 +1,4 @@
-import { Conditions } from "../misc/condition.js";
-import { Costs } from "../misc/cost.js";
+import { createGenericElement, createGenericImage, createOpenModalButton, setButtonDisabled } from "../helpers/helpers_html.js";
 
 /**
  * @typedef ShopItemData
@@ -18,6 +17,7 @@ import { Costs } from "../misc/cost.js";
  * @typedef ShopItemSave
  * @prop {string} id The unique id of the item sold in the shop.
  * @prop {number} stock The current stock of the item.
+ * @prop {number} [restockDate] The date in milliseconds for the next restock.
  */
 
 /**
@@ -26,15 +26,16 @@ import { Costs } from "../misc/cost.js";
  * @prop {ShopItemSave[]} saves The array of shop item save of the shop.
  */
 
+/** Class that represents an item sold in the shop. */
 export class ShopItem {
-    /**
-     * 
-     * @param {import("../main.js").Game_Instance} game The game instance. 
-     * @param {ShopItemData} [itemData] An object containing info about the item sold in the shop.
-     */
-    constructor(game, itemData = {}) {
-        this.item = itemData.id === undefined ? game.errors.item : game.items.getItem(itemData.id);
+    /** @param {ShopItemData} [itemData] An object containing info about the item sold in the shop. */
+    constructor(itemData = {}) {
+        /** The item associated with the shop item. */
+        this.id = itemData.id === undefined ? "error" : itemData.id;
+        /** Bool to allow the item to restock. */
         this.canRestock = itemData.canRestock === undefined ? true : itemData.canRestock;
+        /** The date in milliseconds for the next restock. */
+        this.restockDate = 0;
         /** The base stock of the item. */
         this.baseStock = itemData.baseStock === undefined ? 1 : itemData.baseStock;
         /** @private The current stock of the item. */
@@ -48,10 +49,7 @@ export class ShopItem {
 
     /** @returns {ShopItemSave} The save object for the shop item. */
     save() {
-        return {
-            id: this.item.id,
-            stock: this.stock
-        }
+        return {id: this.id, stock: this._stock, restockDate: this.restockDate};
     }
 
     /**
@@ -59,8 +57,11 @@ export class ShopItem {
      * @param {ShopItemSave} save The save object to load.
      */
     load(save = {}) {
-        if (save.stock !== undefined) {
+        if (save.stock !== undefined && !isNaN(save.stock)) {
             this._stock = save.stock;
+        }
+        if (save.restockDate !== undefined && !isNaN(save.restockDate)) {
+            this.restockDate = save.restockDate;
         }
     }
 
@@ -69,46 +70,67 @@ export class ShopItem {
      * @param {import("../main.js").Game_Instance} game The game instance.
      * @param {number} amount The number of item to buy.
      */
-    buyItem(game, amount) {
-        if (game.inventory.isFull) {
-            console.log("Failed to buy item " + this.item.name + " because the inventory is full.");
+    buy(game, amount) {
+        if (isNaN(amount) || this._stock < amount) {
+            console.log("Failed to buy shop item with id " + this.id + " because the amount is invalid.");
             return;
         }
-        if (isNaN(amount) || amount < 1 || amount > this.item.maxStack || this.stock < amount || this.item.buyData.length === 0) {
-            console.log("Failed to buy item " + this.item.name + " because the amount is invalid.");
-            return;
+        const boughtAmount = game.items.getItem(this.id).buy(game, amount);
+        if (boughtAmount > 0) {
+            this._stock -= boughtAmount;
+            if (this.canRestock && this.restockDate === 0) {
+                this.restockDate = Date.now() + 300000;
+            }
         }
-        amount = Math.floor(amount);
-        const costs = new Costs(game, this.item.buyData);
-        if (!new Conditions(game, this.item.conditionsData).checkConditions() || !costs.checkCurrencies(amount)) {
-            console.log("Failed to buy item " + this.item.name + " because the conditions or costs check failed.");
-            return;
-        }
-        
-        game.inventory.addItem(this.item, amount);
-        this._stock -= amount;
-        costs.removeCurrencies(amount);
     }
 
     /** Restock the item to the base stock if it can be restocked. */
     restock() {
-        if (this.canRestock) {
+        if (this.canRestock && Date.now() >= this.restockDate) {
             this._stock = this.baseStock;
+            this.restockDate = 0;
         }
+    }
+
+    /**
+     * Create a section for the shop item.
+     * @param {import("../main.js").Game_Instance} game The game instance.
+     * @param {HTMLElement} parent The parent to append the section.
+     * @param {import("../ui/modals/modal_shop.js").Modal_Shop} modal The modal to open when clicking the buy button.
+     */
+    createSection(game, parent, modal) {
+        const item = game.items.getItem(this.id);
+        const itemRoot = createGenericElement(parent, {className: "col-12 col-md-6"});
+        const itemBg = createGenericElement(itemRoot, {className: "d-flex flex-column section m-0 p-2 h-100"});
+
+        const itemDiv = createGenericElement(itemBg, {className: "d-flex flex-column flex-lg-row mb-1"});
+        createGenericImage(itemDiv, {className: "item-icon mx-auto", attributes: {"src": item.icon}});
+        const itemInfoDiv = createGenericElement(itemDiv, {className: "d-flex flex-column col ms-lg-3"});
+        createGenericElement(itemInfoDiv, {tag: "h5", className: "m-0", innerHTML: item.name});
+
+        const conditions = game.createConditions(item.conditionsData);
+        const conditionsString = conditions.getConditionsString();
+        createGenericElement(itemInfoDiv, {className: "fs-6", innerHTML: item.description});
+        createGenericElement(itemInfoDiv, {innerHTML: conditionsString});
+
+        const costs = game.createCosts(item.buyData);
+        const costsRoot = createGenericElement(itemInfoDiv, {className: "d-lg-flex"});
+        costs.createCostLabels(costsRoot);
+
+        const buyButton = createOpenModalButton(itemBg, {className: "btn btn-success p-1 mt-auto", innerHTML: game.languages.getString("buy")}, {id: "#modal-shop", onclick: (e) => { modal.update(this, item, costs); }});
+        setButtonDisabled(buyButton, !conditions.checkConditions());
     }
 }
 
+/** Class that represents a shop in the game. */
 export class Shop {
-    /**
-     * @param {import("../main.js").Game_Instance} game The game instance. 
-     * @param {ShopData} shopData An object containing info about the shop.
-     */
-    constructor(game, shopData = {}) {
+    /** @param {ShopData} shopData An object containing info about the shop. */
+    constructor(shopData = {}) {
         this.id = shopData.id === undefined ? "error" : shopData.id;
         /** @type {ShopItem[]} */
         this.items = [];
         if (Array.isArray(shopData.itemData)) {
-            shopData.itemData.forEach((data) => { this.items.push(new ShopItem(game, data)); });
+            shopData.itemData.forEach((data) => { this.items.push(new ShopItem(data)); });
         }
     }
 
@@ -146,7 +168,7 @@ export class Shop {
      */
     getShopItem(id) {
         for (const shopItem of this.items) {
-            if (shopItem.item.id === id) {
+            if (shopItem.id === id) {
                 return shopItem;
             }
         }

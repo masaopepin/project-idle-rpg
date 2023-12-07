@@ -11,7 +11,7 @@ export class Item_Icon {
         /** The root element of the icon */
         this.root = createGenericElement(parent, {className: "col-auto my-2"});
         /** The section element of the icon. */
-        this.section = createGenericButton(this.root, {className: "section item-icon m-0 p-1 bg-dark position-relative", attributes: {"data-bs-html": "true", "data-bs-title": "placeholder"}});
+        this.section = createGenericButton(this.root, {className: "section item-icon m-0 p-1 bg-body position-relative", attributes: {"data-bs-html": "true", "data-bs-title": "placeholder"}});
         /** The tooltip to be displayed on hover. */
         this.tooltip = bootstrap.Tooltip.getOrCreateInstance(this.section, {"trigger": "hover", "customClass": "tooltip-hover-none"});
         /** The open modal link that opens the modal associated with the icon. */

@@ -1,10 +1,11 @@
 import { Page } from "./page.js";
-import { createGenericButton, createGenericElement, createGenericInput, removeChildren } from "../helpers/helpers_html.js";
+import { createGenericButton, createGenericElement, createGenericInput, createUpgradeButton, removeChildren } from "../helpers/helpers_html.js";
 import { Equipment_Icon, Inventory_Icon } from "../ui/item_icon.js";
 import { Inventory_Label } from "../ui/labels/icon_label.js";
 import { Modal_Inventory } from "../ui/modals/modal_inventory.js";
 import { Modal_Equipment } from "../ui/modals/modal_equipment.js";
 import { Dropdown_Generic } from "../ui/dropdowns/dropdown_generic.js";
+import { Modal_Upgrade } from "../ui/modals/modal_upgrade.js";
 
 /**
  * Page for the player inventory.
@@ -16,6 +17,7 @@ export class Page_Inventory extends Page {
         super(game, "inventory");
         this.modalEquipment = null;
         this.modalInventory = null;
+        this.modalUpgrade = null;
 
         this.equipmentRow = null;
         this.inventoryRow = null;
@@ -43,24 +45,24 @@ export class Page_Inventory extends Page {
         this.nameFilter = "";
         this.modalInventory = new Modal_Inventory(this.game, this.game.pages.modalRoot);
         this.modalEquipment = new Modal_Equipment(this.game, this.game.pages.modalRoot);
+        this.modalUpgrade = new Modal_Upgrade(this.game, this.game.pages.modalRoot);
 
         const equipmentSection = this.createSectionTitle(this.container, this.game.languages.getString("equipments"));
         this.equipmentRow = createGenericElement(equipmentSection, {className: "row g-2 m-1"});
 
-        const inventorySection = createGenericElement(this.container, {className: "section mb-3"});
-        //const filtersRow = createGenericElement(inventorySection, {className: "d-flex flex-column flex-md-row align-items-center m-3"});
-        const filtersRow = createGenericElement(inventorySection, {className: "row rounded-top py-2 bg-dark"});
+        const inventorySection = this.createSectionTitle(this.container);
+        const filtersRow = this.createSectionTopRow(inventorySection);
         this.inventoryRow = createGenericElement(inventorySection, {className: "row g-2 m-1"});
-        //const labelDiv = createGenericElement(filtersRow, {className: "col-lg-auto m-auto"});
-        this.inventoryLabel = new Inventory_Label(this.game, filtersRow);
-        this.inventoryLabel.root.classList.add("col-lg-auto", "justify-content-center");
-        //const inventorySizeDiv = createGenericElement(filtersRow, {className: "col-lg-auto m-auto text-center"});
-        //createGenericElement(inventorySizeDiv, {tag: "small", className: "col-auto", innerHTML: this.game.languages.getString("inventory") + " :"});
-        //this.inventorySize = createGenericElement(inventorySizeDiv, {tag: "small", className: "col-auto ms-1", innerHTML: this.game.inventory.inventory.size + " / " + this.game.inventory.maxSize});
+
+        // Inventory size
+        const inventorySize = createGenericElement(filtersRow, {className: "col-lg-auto d-flex justify-content-center my-1 my-lg-0"});
+        this.inventoryLabel = new Inventory_Label(this.game, inventorySize);
+        createUpgradeButton(inventorySize, this.modalUpgrade, this.game.upgrades.getUpgrade("inventorySize"));
+
         // Category filter
         const inputGroup = createGenericElement(filtersRow, {className: "col-sm d-flex flex-column flex-sm-row px-0"});
         this.categoryDropdown = new Dropdown_Generic(inputGroup, "filterItemCategory", {
-            className: "col-12 col-sm-auto ms-lg-auto",
+            className: "d-flex col-12 col-sm-auto ms-lg-auto",
             activeItem: this.categoryFilter,
             itemList: Object.keys(this.game.items.categories),
             onclick: (e) => {
@@ -73,11 +75,11 @@ export class Page_Inventory extends Page {
         });
 
         // Type filter
-        this.typeDropdown = new Dropdown_Generic(inputGroup, "filterItemType", {className: "col-12 col-sm-auto"});
+        this.typeDropdown = new Dropdown_Generic(inputGroup, "filterItemType", {className: "d-flex col-12 col-sm-auto"});
         this.setTypeDropdown();
 
-        const nameInputGroup = createGenericElement(filtersRow, {className: "col input-group"});
         // Name filter
+        const nameInputGroup = createGenericElement(filtersRow, {className: "col input-group"});
         this.nameInput = createGenericInput(nameInputGroup, {
             className: "form-control",
             attributes: {
@@ -97,6 +99,7 @@ export class Page_Inventory extends Page {
         };
         createGenericButton(nameInputGroup, {className: "btn btn-danger", innerHTML: "X"}, {onclick: () => { this.unfilterInventory(); }});
 
+        // Item icons
         this.createEquipmentIcons();
         this.createInventoryIcons();
 
@@ -104,6 +107,7 @@ export class Page_Inventory extends Page {
         document.addEventListener("itemRemoved", (e) => { this.itemRemoved(e); }, {signal: this.abortController.signal});
         document.addEventListener("itemEquipped", (e) => { this.itemEquipped(e); }, {signal: this.abortController.signal});
         document.addEventListener("itemUnequipped", (e) => { this.itemUnequipped(e); }, {signal: this.abortController.signal});
+        document.addEventListener("upgradeApplied", (e) => { this.upgradeApplied(e); }, {signal: this.abortController.signal});
     }
 
     update() {
@@ -119,6 +123,10 @@ export class Page_Inventory extends Page {
         if (this.modalInventory !== null) {
             this.modalInventory.modal.remove();
             this.modalInventory = null;
+        }
+        if (this.modalUpgrade !== null) {
+            this.modalUpgrade.modal.remove();
+            this.modalUpgrade = null;
         }
 
         this.equipmentRow = null;
@@ -140,7 +148,6 @@ export class Page_Inventory extends Page {
     itemAdded(e) {
         /** @type {import("../events/manager_event.js").itemAdded} */
         const eventData = e.eventData;
-        console.log("ItemAdded: " + eventData.slot.item.name);
 
         if (eventData.wasCreated) {
             this.inventoryLabel.update();
@@ -159,7 +166,7 @@ export class Page_Inventory extends Page {
     itemRemoved(e) {
         /** @type {import("../events/manager_event.js").itemRemoved} */
         const eventData = e.eventData;
-        console.log("ItemRemoved: " + eventData.slot.item.name);
+
         for (const inventoryIcon of this.inventoryIcons) {
             if (inventoryIcon.slot === eventData.slot) {
                 if (eventData.wasDeleted) {
@@ -178,15 +185,22 @@ export class Page_Inventory extends Page {
     itemEquipped(e) {
         /** @type {import("../events/manager_event.js").itemEquipped} */
         const eventData = e.eventData;
-        console.log("ItemEquipped: " + eventData.item.name);
         this.updateEquipmentIcon(eventData.slot);
     }
 
     itemUnequipped(e) {
         /** @type {import("../events/manager_event.js").itemUnequipped} */
         const eventData = e.eventData;
-        console.log("ItemUnequipped: " + eventData.item.name);
         this.updateEquipmentIcon(eventData.slot);
+    }
+
+    upgradeApplied(e) {
+        /** @type {import("../events/manager_event.js").upgradeApplied} */
+        const eventData = e.eventData;
+
+        if (eventData.upgrade.id === "inventorySize") {
+            this.inventoryLabel.update();
+        }
     }
 
     /**
@@ -225,6 +239,7 @@ export class Page_Inventory extends Page {
         }
     }
 
+    /** Create the type filter dropdown items for the current language. */
     setTypeDropdown() {
         this.typeDropdown.createItems({
             activeItem: this.typeFilter,
@@ -237,10 +252,12 @@ export class Page_Inventory extends Page {
         });
     }
 
+    /** Show or hide all items in the inventory based on the current filters. */
     filterInventory() {
         this.inventoryIcons.forEach((icon) => { icon.filter(this.categoryFilter, this.typeFilter, this.nameFilter, this.allString); });
     }
 
+    /** Reset all filters to default and show all items. */
     unfilterInventory() {
         for (const inventoryIcon of this.inventoryIcons) {
             inventoryIcon.root.classList.remove("d-none");

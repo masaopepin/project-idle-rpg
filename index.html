@@ -13,12 +13,12 @@
 </head>
 
 <body class="container-fluid p-0 h-100">
-    <header class="navbar fixed-top bg-dark shadow">
+    <header class="navbar fixed-top shadow">
         <div class="page-title ms-2 me-auto" id="page-title">Page title</div>
         <div class="money-label me-1 ms-auto" id="money"></div>
         <ul class="navbar-nav d-md-none">
             <li class="nav-item">
-                <button class="nav-link mx-3 my-0 p-0 text-white" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarNav"
+                <button class="nav-link mx-3 my-0 p-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarNav"
                         aria-controls="sidebarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="bi bi-list"></i>
                 </button>
@@ -27,7 +27,7 @@
     </header>
 
     <div class="row p-0 h-100">
-        <div class="col-auto bg-dark p-0 overflow-y-auto" style="margin-top: 49px; height: calc(100% - 49px);">
+        <div class="col-auto p-0 overflow-y-auto shadow" style="margin-top: 49px; height: calc(100% - 49px);">
             <div class="offcanvas-md offcanvas-end" id="sidebarNav">
                 <div class="offcanvas-header">
                     <button class="nav-link d-md-none px-3 close-button" type="button" data-bs-dismiss="offcanvas" data-bs-target="#sidebarNav" aria-label="Close">
@@ -65,10 +65,11 @@
             </div>
         </div>
 
-        <main class="col bg-secondary px-0 overflow-y-auto" id="game-root" style="margin-top: 49px; height: calc(100% - 49px);"></main>
+        <main class="col px-0 overflow-y-auto position-relative" id="game-root" style="margin-top: 49px; height: calc(100% - 49px);">
+            <div class="toast-container top-0 start-50 translate-middle-x p-1" id="middle-toast-container"></div>
+        </main>
     </div>
 
-    <div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-1" id="bottom-toast-container"></div>
     <div id="modal-root"></div>
     <datalist id="itemNames"></datalist>
     

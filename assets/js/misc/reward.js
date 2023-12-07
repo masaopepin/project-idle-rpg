@@ -149,7 +149,7 @@ export class Reward_Skill_Xp extends Reward {
 
     /** @param {HTMLElement} parent The parent to append the icon label. */
     createTotalLabel(parent) {
-        return new Icon_Label(parent, {source: this.skill.icon, tooltip: this.skill.name, updateFunction: () => { return "+" + this.totalAmount + " " + this.game.languages.getString("xp"); }});
+        return new Icon_Label(parent, {source: this.skill.icon, tooltip: this.skill.name, updateFunction: () => { return "+" + Math.floor(this.totalAmount) + " " + this.game.languages.getString("xp"); }});
     }
 }
 

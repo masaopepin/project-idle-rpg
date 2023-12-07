@@ -124,6 +124,19 @@ export function createOpenModalLink(parent, elementData = {}, linkData = {}) {
 }
 
 /**
+ * Create a new upgrade button that opens the modal for the given upgrade.
+ * @param {HTMLElement} parent Parent to append the button.
+ * @param {import("../ui/modals/modal_upgrade.js").Modal_Upgrade} modal The modal to open on click.
+ * @param {import("../upgrades/upgrade.js").Upgrade} upgrade The upgrade to update the modal.
+ * @returns 
+ */
+export function createUpgradeButton(parent, modal, upgrade) {
+    const button = createOpenModalButton(parent, {className: "btn btn-sm btn-success"}, {id: "#modal-upgrade", onclick: () => { modal.update(upgrade); }});
+    createGenericElement(button, {tag:"i", className: "bi bi-plus-lg"});
+    return button;
+}
+
+/**
  * @typedef GenericImageData
  * @prop {boolean} [isFluid] Optional bool to add the img-fluid class to the image. Defaults to true.
  */

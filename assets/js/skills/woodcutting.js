@@ -15,7 +15,7 @@ export class Woodcutting extends Skill {
                 {
                     id: "node_deadTree",
                     actionId: "action_cut",
-                    duration: 2000,
+                    duration: 3000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -39,7 +39,7 @@ export class Woodcutting extends Skill {
                 {
                     id: "node_oakTree",
                     actionId: "action_cut",
-                    duration: 3000,
+                    duration: 4000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -63,7 +63,7 @@ export class Woodcutting extends Skill {
                 {
                     id: "node_mapleTree",
                     actionId: "action_cut",
-                    duration: 4000,
+                    duration: 5000,
                     conditionsData: [
                         {
                             type: "skillLevel",

@@ -7,7 +7,6 @@ export const TOOLS = {
         {
             id: "bronzeRod",
             icon: "./assets/icons/tools/rods/bronze_rod.png",
-            nextUpgrade: "ironRod",
             maxStack: 1,
             multipliers: {
                 fishing_xp: 0.25,
@@ -28,8 +27,8 @@ export const TOOLS = {
                 },
                 {
                     type: "item",
-                    itemId: "sardine",
-                    amount: 5
+                    itemId: "rawSardine",
+                    amount: 20
                 }
             ],
             sellData: [
@@ -43,7 +42,6 @@ export const TOOLS = {
         {
             id: "ironRod",
             icon: "./assets/icons/tools/rods/iron_rod.png",
-            nextUpgrade: "steelRod",
             maxStack: 1,
             multipliers: {
                 fishing_xp: 0.5,
@@ -61,6 +59,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 5000
+                },
+                {
+                    type: "item",
+                    itemId: "rawTrout",
+                    amount: 50
                 }
             ],
             sellData: [
@@ -91,6 +94,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 10000
+                },
+                {
+                    type: "item",
+                    itemId: "rawSalmon",
+                    amount: 100
                 }
             ],
             sellData: [
@@ -106,7 +114,6 @@ export const TOOLS = {
         {
             id: "bronzeAxe",
             icon: "./assets/icons/tools/axes/bronze_axe.png",
-            nextUpgrade: "ironAxe",
             maxStack: 1,
             multipliers: {
                 woodcutting_xp: 0.25,
@@ -124,6 +131,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 1000
+                },
+                {
+                    type: "item",
+                    itemId: "deadTreeLog",
+                    amount: 20
                 }
             ],
             sellData: [
@@ -137,7 +149,6 @@ export const TOOLS = {
         {
             id: "ironAxe",
             icon: "./assets/icons/tools/axes/iron_axe.png",
-            nextUpgrade: "steelAxe",
             maxStack: 1,
             multipliers: {
                 woodcutting_xp: 0.5,
@@ -155,6 +166,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 5000
+                },
+                {
+                    type: "item",
+                    itemId: "oakLog",
+                    amount: 50
                 }
             ],
             sellData: [
@@ -185,6 +201,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 10000
+                },
+                {
+                    type: "item",
+                    itemId: "mapleLog",
+                    amount: 100
                 }
             ],
             sellData: [
@@ -200,7 +221,6 @@ export const TOOLS = {
         {
             id: "bronzePickaxe",
             icon: "./assets/icons/tools/pickaxes/bronze_pickaxe.png",
-            nextUpgrade: "ironPickaxe",
             maxStack: 1,
             multipliers: {
                 mining_xp: 0.25,
@@ -218,6 +238,16 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 1000
+                },
+                {
+                    type: "item",
+                    itemId: "copperOre",
+                    amount: 10
+                },
+                {
+                    type: "item",
+                    itemId: "tinOre",
+                    amount: 10
                 }
             ],
             sellData: [
@@ -231,7 +261,6 @@ export const TOOLS = {
         {
             id: "ironPickaxe",
             icon: "./assets/icons/tools/pickaxes/iron_pickaxe.png",
-            nextUpgrade: "steelPickaxe",
             maxStack: 1,
             multipliers: {
                 mining_xp: 0.5,
@@ -249,6 +278,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 5000
+                },
+                {
+                    type: "item",
+                    itemId: "ironOre",
+                    amount: 50
                 }
             ],
             sellData: [
@@ -280,6 +314,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 10000
+                },
+                {
+                    type: "item",
+                    itemId: "coalOre",
+                    amount: 100
                 }
             ],
             sellData: [
@@ -295,7 +334,6 @@ export const TOOLS = {
         {
             id: "bronzeKnife",
             icon: "./assets/icons/tools/knives/bronze_knife.png",
-            nextUpgrade: "ironKnife",
             maxStack: 1,
             multipliers: {
                 cooking_xp: 0.25,
@@ -313,6 +351,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 1000
+                },
+                {
+                    type: "item",
+                    itemId: "sardine",
+                    amount: 20
                 }
             ],
             sellData: [
@@ -326,7 +369,6 @@ export const TOOLS = {
         {
             id: "ironKnife",
             icon: "./assets/icons/tools/knives/iron_knife.png",
-            nextUpgrade: "steelKnife",
             maxStack: 1,
             multipliers: {
                 cooking_xp: 0.5,
@@ -344,6 +386,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 5000
+                },
+                {
+                    type: "item",
+                    itemId: "trout",
+                    amount: 50
                 }
             ],
             sellData: [
@@ -375,6 +422,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 10000
+                },
+                {
+                    type: "item",
+                    itemId: "salmon",
+                    amount: 100
                 }
             ],
             sellData: [
@@ -390,7 +442,6 @@ export const TOOLS = {
         {
             id: "bronzeHammer",
             icon: "./assets/icons/tools/hammers/bronze_hammer.png",
-            nextUpgrade: "ironHammer",
             maxStack: 1,
             multipliers: {
                 smithing_xp: 0.25,
@@ -408,6 +459,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 1000
+                },
+                {
+                    type: "item",
+                    itemId: "bronzeIngot",
+                    amount: 20
                 }
             ],
             sellData: [
@@ -421,7 +477,6 @@ export const TOOLS = {
         {
             id: "ironHammer",
             icon: "./assets/icons/tools/hammers/iron_hammer.png",
-            nextUpgrade: "steelHammer",
             maxStack: 1,
             multipliers: {
                 smithing_xp: 0.5,
@@ -439,6 +494,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 5000
+                },
+                {
+                    type: "item",
+                    itemId: "ironIngot",
+                    amount: 50
                 }
             ],
             sellData: [
@@ -470,6 +530,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 10000
+                },
+                {
+                    type: "item",
+                    itemId: "steelIngot",
+                    amount: 100
                 }
             ],
             sellData: [
@@ -485,7 +550,6 @@ export const TOOLS = {
         {
             id: "bronzeSaw",
             icon: "./assets/icons/tools/saws/bronze_saw.png",
-            nextUpgrade: "ironSaw",
             maxStack: 1,
             multipliers: {
                 carpentering_xp: 0.25,
@@ -503,6 +567,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 1000
+                },
+                {
+                    type: "item",
+                    itemId: "deadTreePlank",
+                    amount: 20
                 }
             ],
             sellData: [
@@ -516,7 +585,6 @@ export const TOOLS = {
         {
             id: "ironSaw",
             icon: "./assets/icons/tools/saws/iron_saw.png",
-            nextUpgrade: "steelSaw",
             maxStack: 1,
             multipliers: {
                 carpentering_xp: 0.5,
@@ -534,6 +602,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 5000
+                },
+                {
+                    type: "item",
+                    itemId: "oakPlank",
+                    amount: 50
                 }
             ],
             sellData: [
@@ -564,6 +637,11 @@ export const TOOLS = {
                     type: "item",
                     itemId: "money",
                     amount: 10000
+                },
+                {
+                    type: "item",
+                    itemId: "maplePlank",
+                    amount: 100
                 }
             ],
             sellData: [

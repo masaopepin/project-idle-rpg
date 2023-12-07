@@ -1,18 +1,7 @@
 import { Page } from "./page.js";
-import { createGenericElement, createGenericButton, removeChildren, createOpenModalButton } from "../helpers/helpers_html.js";
-import { Icon_Label, Duration_Label } from "../ui/labels/icon_label.js";
+import { createGenericElement, createGenericButton, removeChildren } from "../helpers/helpers_html.js";
 import { Modal_Crafting } from "../ui/modals/modal_crafting.js";
 import { Progressbar } from "../ui/progressbar.js";
-
-/**
- * @typedef Gathering_Section
- * @prop {import("../skills/gathering_node.js").Gathering_Node} gatheringNode The gathering node associated with the section.
- * @prop {import("../actions/action.js").Action} action The action associated with the section.
- * @prop {HTMLElement} conditions The HTMLElement containing the conditions string.
- * @prop {Set.<Icon_Label>} rewards The set of icon label containing the rewards.
- * @prop {Duration_Label} durationLabel The duration label for the action.
- * @prop {Progressbar} actionProgress The progressbar for the elapsed time of the action.
- */
 
 /**
  * Base class for all skill pages.
@@ -27,16 +16,18 @@ export class Page_Skill extends Page {
         super(game, skill.id);
         /** The skill associated to the page. */
         this.skill = skill;
+
         this.levelText = null;
         this.xpBar = null;
         this.xpText = null;
+
         this.gatheringRoot = null;
-        /** @type {Gathering_Section[]} */
+        /** @type {import("../skills/gathering_node.js").GatheringSection[]} */
         this.sections = [];
-        /** @type {Set.<Gathering_Section>} */
+        /** @type {Set.<import("../skills/gathering_node.js").GatheringSection>} */
         this.activeSections = new Set();
 
-        /** @type {Set.<Icon_Label>} */
+        /** @type {Set.<import("../ui/labels/icon_label.js").Icon_Label>} */
         this.craftingLabels = new Set();
         this.craftingNav = null;
         this.craftingRoot = null;
@@ -48,15 +39,14 @@ export class Page_Skill extends Page {
 
     enter() {
         super.enter();
-        const row = createGenericElement(this.container, {className: "row section bg-dark p-1"});
+        const row = createGenericElement(this.container, {className: "row section p-1"});
 
-        this.levelText = new Icon_Label(row, {source: this.skill.icon, tooltip: this.skill.name, updateFunction: () => { return this.skill.level; }});
-        this.levelText.root.classList.add("justify-content-center");
-        
-        const maxXp = this.skill.maxXp;
-        this.xpBar = new Progressbar(row, this.game.languages.getString("xp") + " " + this.skill.name);
-        this.xpBar.update(this.skill.xp, maxXp, this.skill.xpPercent);
-        this.xpText = createGenericElement(row, {className: "text-center", innerHTML: Math.floor(this.skill.xp) + " / " + Math.floor(maxXp)});
+        this.levelText = createGenericElement(row, {className: "text-center"});
+        this.xpBar = new Progressbar(row, this.game.languages.getString("xp") + " " + this.skill.name, "bg-warning");
+        this.xpText = createGenericElement(row, {className: "text-center"});
+        this.updateLevelText();
+        this.updateXpBar();
+        this.updateXpText();
 
         this.createGatheringNodeElements();
         this.createCraftingRecipeElements();
@@ -87,9 +77,9 @@ export class Page_Skill extends Page {
         this.xpBar = null;
         this.xpText = null;
 
+        this.gatheringRoot = null;
         this.sections = [];
         this.activeSections.clear();
-        this.gatheringRoot = null;
 
         this.craftingLabels.clear();
         this.craftingNav = null;
@@ -103,23 +93,22 @@ export class Page_Skill extends Page {
     xpAdded(e) {
         /** @type {import("../events/manager_event.js").xpAdded} */
         const eventData = e.eventData;
-
         if (eventData.skill !== this.skill) {
             return;
         }
-        const maxXp = this.skill.maxXp;
-        if (this.xpBar !== null) {
-            this.xpBar.update(this.skill.xp, maxXp, this.skill.xpPercent);
-        }
-        if (this.xpText !== null) {
-            this.xpText.innerHTML = Math.floor(this.skill.xp) + " / " + Math.floor(maxXp);
-        }
+
+        this.updateXpBar();
+        this.updateXpText();
     }
 
     leveledUp(e) {
-        if (this.levelText !== null) {
-            this.levelText.update();
+        /** @type {import("../events/manager_event.js").leveledUp} */
+        const eventData = e.eventData;
+        if (eventData.skill !== this.skill) {
+            return;
         }
+
+        this.updateLevelText();
         for (const section of this.sections) {
             section.conditions.innerHTML = section.gatheringNode.conditions.getConditionsString();
         }
@@ -150,11 +139,13 @@ export class Page_Skill extends Page {
     actionStarted(e) {
         /** @type {import("../events/manager_event.js").actionStarted} */
         const eventData = e.eventData;
-        if (eventData.action.gatheringNode === undefined) {
+        const node = eventData.action.gatheringNode;
+        if (node === undefined) {
             return;
         }
+
         for (const section of this.sections) {
-            if (eventData.action.gatheringNode.id === section.gatheringNode.id) {
+            if (node.id === section.gatheringNode.id) {
                 section.action = eventData.action;
                 this.activeSections.add(section);
                 return;
@@ -173,93 +164,81 @@ export class Page_Skill extends Page {
     actionStopped(e) {
         /** @type {import("../events/manager_event.js").actionStopped} */
         const eventData = e.eventData;
-        if (eventData.action.craftingRecipe !== undefined && this.modalCrafting !== null && eventData.action === this.modalCrafting.actionRow.action) {
-            if (this.modalCrafting !== null) {
-                this.modalCrafting.actionRow.row.classList.add("d-none");
-                this.modalCrafting.inputs.root.classList.remove("d-none");
-                this.modalCrafting.actionButton.classList.remove("d-none");
-                this.modalCrafting.updateInput(this.modalCrafting.craftingRecipe.costs.getMaxAmount());
-            }
-        }
-        if (eventData.action.oldGatheringNode === undefined) {
+        if (this.modalCrafting !== null && eventData.action === this.modalCrafting.actionRow.action) {
+            this.modalCrafting.hideActionRow();
             return;
         }
-        for (const activeSection of this.activeSections) {
-            if (eventData.action.oldGatheringNode.id === activeSection.gatheringNode.id) {
-                this.activeSections.delete(activeSection);
-                activeSection.actionProgress.update(0, 0, "0%");
-                return;
+
+        if (eventData.action.type === "gathering") {
+            for (const activeSection of this.activeSections) {
+                if (eventData.action === activeSection.action) {
+                    this.activeSections.delete(activeSection);
+                    activeSection.actionProgress.update(0, 0, "0%");
+                    return;
+                }
             }
         }
     }
 
+    /** Update the level text with the current level string. */
+    updateLevelText() {
+        if (this.levelText !== null) {
+            this.levelText.innerHTML = this.skill.levelString;
+        }
+    }
+
+    /** Update the xp bar with the current xp values. */
+    updateXpBar() {
+        if (this.xpBar !== null) {
+            if (this.skill.isMaxLevel) {
+                this.xpBar.update(1, 1, "100%");
+            }
+            else {
+                this.xpBar.update(this.skill.xp, this.skill.maxXp, this.skill.xpPercent);
+            }
+        }
+    }
+
+    /** Update the xp text with the current xp string. */
+    updateXpText() {
+        if (this.xpText !== null) {
+            this.xpText.innerHTML = this.skill.xpString;
+        }
+    }
+
+    /** Create all the gathering node elements for the skill. */
     createGatheringNodeElements() {
         if (this.skill.gatheringNodesData === null) {
             return;
         }
-        this.gatheringRoot = createGenericElement(this.container, {className: "row g-2 pb-2 px-1"});
-        this.skill.gatheringNodesData.forEach((gatheringNodeData) => {
-            this.createGatheringNodeElement(this.gatheringRoot, gatheringNodeData);
-        });
-    }
-
-    /**
-     * Create an element to display a gathering node.
-     * @param {HTMLElement} parent The parent to append the element.
-     * @param {import("../skills/gathering_node.js").GatheringNodeData} gatheringNodeData The gatheting node data to create the element.
-     */
-    createGatheringNodeElement(parent, gatheringNodeData) {
-        const gatheringNode = this.skill.createGatheringNode(gatheringNodeData);
-        const action = this.game.actions.getAction(gatheringNode.actionId);
-        const actionName = this.game.languages.getString(gatheringNode.actionId);
-        const nodeName = this.game.languages.getString(gatheringNode.id);
-        const root = createGenericElement(parent, {className: "col-12 col-sm-6 col-md-4"});
-        const border = createGenericElement(root, {className: "d-flex flex-column section bg-dark border-3 w-100 h-100 p-0 m-0 shadow-lg"});
-
-        const button = createGenericButton(border, {className: "btn btn-primary rounded-top rounded-bottom-0 p-0 w-100"}, {onclick: () => { this.skill.startGathering(gatheringNode); }});
-        createGenericElement(button, {innerHTML: actionName});
-        createGenericElement(button, {innerHTML: nodeName});
-        
-        const conditionsDiv = createGenericElement(border, {className: "d-flex bg-dark w-100 p-1"});
-        const conditions = createGenericElement(conditionsDiv, {className: "mx-auto", innerHTML: gatheringNode.conditions.getConditionsString()});
-        const rewardsRoot = createGenericElement(border, {className: "bg-dark w-100 px-2 mt-auto mb-0"});
-        const rewards = gatheringNode.rewards.createRewardLabels(rewardsRoot);
-
-        /** @type {Gathering_Section} */
-        const section = {
-            gatheringNode: gatheringNode,
-            action: action,
-            conditions: conditions,
-            rewards: rewards
-        }
-
-        section.durationLabel = new Duration_Label(this.game, rewardsRoot, {baseDuration: gatheringNode.baseDuration, skill: this.skill});
-        section.actionProgress = new Progressbar(border, actionName + " " + nodeName);
-        section.actionProgress.root.classList.add("px-2");
-        this.sections.push(section);
-        if (action.gatheringNode !== undefined && action.gatheringNode.id === gatheringNode.id) {
-            this.activeSections.add(section);
+        this.gatheringRoot = createGenericElement(this.container, {className: "row g-3"});
+        for (const nodeData of this.skill.gatheringNodesData) {
+            const section = this.skill.createGatheringNode(nodeData).createSection(this.game, this.gatheringRoot);
+            this.sections.push(section);
+            if (section.action !== null) {
+                this.activeSections.add(section);
+            }
         }
     }
 
-    /**
-     * Create all the crafting recipe buttons.
-     * @param {HTMLElement} parent The parent to append the recipe element.
-     * @param {string} recipeType The type of the recipe.
-     */
+    /** Create all the crafting recipe elements for the skill. */
     createCraftingRecipeElements() {
         if (this.skill.craftingRecipesData === null) {
             return;
         }
-        for (const recipeType in this.skill.craftingRecipesData) {
-            if (this.craftingNav === null) {
-                this.craftingNav = createGenericElement(this.container, {className: "section"});
-                this.craftingRoot = createGenericElement(this.container, {className: "row section g-1 p-2"});
-                this.modalCrafting = new Modal_Crafting(this.game, this.game.pages.modalRoot, this.skill);
-                this.switchCraftingPage(recipeType);
-            }
-            createGenericButton(this.craftingNav, {className: "btn btn-dark", innerHTML: this.game.languages.getString(recipeType)}, {onclick: () => { this.switchCraftingPage(recipeType); }});
+        const recipesType = Object.keys(this.skill.craftingRecipesData);
+        if (recipesType.length === 0) {
+            return;
         }
+        const section = this.createSectionTitle(this.container);
+        this.craftingNav = this.createSectionTopRow(section);
+        this.craftingRoot = createGenericElement(section, {className: "row g-1 p-2"});
+        this.modalCrafting = new Modal_Crafting(this.game, this.game.pages.modalRoot, this.skill);
+        this.switchCraftingPage(recipesType[0]);
+
+        recipesType.forEach((recipeType) => {
+            createGenericButton(this.craftingNav, {className: "col-auto btn btn-body rounded-0", innerHTML: this.game.languages.getString(recipeType)}, {onclick: () => { this.switchCraftingPage(recipeType); }});
+        });
     }
 
     /**
@@ -267,36 +246,13 @@ export class Page_Skill extends Page {
      * @param {string} recipeType The type of the recipe.
      */
     switchCraftingPage(recipeType) {
-        if (this.craftingRoot === null) {
+        const recipesData = this.skill.craftingRecipesData[recipeType];
+        if (this.craftingRoot === null || recipesData === undefined) {
             return;
         }
+
         this.craftingLabels.clear();
         removeChildren(this.craftingRoot);
-        for (const recipeData of this.skill.craftingRecipesData[recipeType]) {
-            this.createCraftingRecipeElement(this.craftingRoot, this.skill.createCraftingRecipe(recipeData));
-        }
-    }
-
-    /**
-     * Create an element to display a crafting recipe.
-     * @param {HTMLElement} parent The parent to append the element.
-     * @param {import("../skills/crafting_recipe.js").Crafting_Recipe} craftingRecipe The crafting recipe to create the element.
-     */
-    createCraftingRecipeElement(parent, craftingRecipe) {
-        const root = createGenericElement(parent, {className: "col-12 col-md-6"});
-        const modalButton = createOpenModalButton(root, {className: "btn btn-dark w-100"}, {id: "#modal-crafting", onclick:  () => { this.modalCrafting.update(this.game, craftingRecipe); }})
-
-        this.craftingLabels.add(new Icon_Label(modalButton, {
-            source: craftingRecipe.item.icon, 
-            updateFunction: () => {
-                const conditionsString = craftingRecipe.conditions.getConditionsString();
-                if (conditionsString === "") {
-                    modalButton.disabled = false;
-                    return craftingRecipe.item.name;
-                }
-                modalButton.disabled = true;
-                return conditionsString;
-            }
-        }));
+        recipesData.forEach((recipeData) => { this.craftingLabels.add(this.skill.createCraftingRecipe(recipeData).createButton(this.craftingRoot, this.modalCrafting)); });
     }
 }

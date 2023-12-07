@@ -10,8 +10,6 @@ export class Action_Crafting extends Action {
         super(game);
         /** The crafting recipe associated with the action. */
         this.craftingRecipe = game.errors.craftingRecipe;
-        /** The last crafting recipe that was stopped. */
-        this.oldCraftingRecipe = game.errors.craftingRecipe;
     }
 
     get duration() {
@@ -58,21 +56,13 @@ export class Action_Crafting extends Action {
             console.log("Failed to start crafting action because the action data is invalid.");
             return;
         }
-        const isActionActive = this.game.actions.activeActions.has(this);
-        if (isActionActive && actionData.craftingRecipe.item === this.craftingRecipe.item) {
-            this.stop();
-            return;
-        }
-        if (this.game.inventory.isFull) {
-            console.log("Failed to start crafting action because the inventory is full.");
+        const activeAction = this.game.actions.getCraftingAction(actionData.craftingRecipe.item.id);
+        if (activeAction !== null) {
+            activeAction.stop();
             return;
         }
         if (!this.canStart(actionData)) {
-            console.log("Failed to start crafting action because the conditions or costs failed.");
             return;
-        }
-        if (isActionActive) {
-            this.stop();
         }
         
         this.setAction(actionData);
@@ -97,13 +87,26 @@ export class Action_Crafting extends Action {
         if (this.loopCount < this.loop) {
             this.craftingRecipe.costs.addCurrencies(this.loop - this.loopCount);
         }
-        this.oldCraftingRecipe = this.craftingRecipe;
-        this.craftingRecipe = this.game.errors.craftingRecipe;
-        this.removeAction();
+        super.stop();
     }
 
     /** @param {import("./action.js").ActionData} actionData An object containing info about the action. */
     canStart(actionData) {
-        return actionData.craftingRecipe.conditions.checkConditions() && actionData.craftingRecipe.costs.checkCurrencies(actionData.loop);
+        if (!super.canStart(actionData)) {
+            return false;
+        }
+        if (!actionData.craftingRecipe.conditions.checkConditions()) {
+            this.game.pages.createFailureToast(this.game.languages.getString("error_conditionsFailed"));
+            return false;
+        }
+        if (!actionData.craftingRecipe.costs.checkCurrencies(actionData.loop)) {
+            this.game.pages.createFailureToast(this.game.languages.getString("error_notEnoughCurrency"));
+            return false;
+        }
+        if (this.game.inventory.isFull) {
+            this.game.pages.createFailureToast(this.game.languages.getString("error_inventoryFull"));
+            return false;
+        }
+        return true;
     }
 }

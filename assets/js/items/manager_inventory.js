@@ -4,8 +4,6 @@
  * @prop {import("./item.js").ItemSave} save The item save associated with the item.
  */
 
-import { Rewards } from "../misc/reward.js";
-
 /** Class for slots in the player inventory. */
 export class InventorySlot {
     /**
@@ -81,8 +79,9 @@ export class InventorySlot {
             return;
         }
         amount = Math.floor(amount);
-        new Rewards(game, this.item.sellData).giveRewards(amount);
+        game.createRewards(this.item.sellData).giveRewards(amount);
         this.removeItem(game, amount);
+        game.pages.createSuccessToast(game.languages.getString("success_itemSold"));
     }
 }
 
@@ -95,8 +94,12 @@ export class Manager_Inventory {
          * @type {Set.<InventorySlot>}
          */
         this.inventory = new Set();
-        /** @private The maximum number of slot in the inventory. */
-        this._maxSize = 10;
+        /** The default maximum number of slot in the inventory. */
+        this.defaultSize = 10;
+        /** @private The current maximum number of slot in the inventory. */
+        this._maxSize = this.defaultSize;
+        /** The cap for the maximum number of slot in the inventory. */
+        this.sizeCap = 100;
     }
 
     /** The current number of slot in the inventory. */
@@ -104,7 +107,7 @@ export class Manager_Inventory {
         return this.inventory.size;
     }
 
-    /** The maximum number of slot in the inventory. */
+    /** The current maximum number of slot in the inventory. */
     get maxSize() {
         return this._maxSize;
     }
@@ -272,5 +275,13 @@ export class Manager_Inventory {
      */
     deleteSlot(slot) {
         this.inventory.delete(slot);
+    }
+
+    /** Set the maximum size of inventory up to the size cap. */
+    setMaxSize(size) {
+        if (isNaN(size) || size < this.defaultSize || size > this.sizeCap) {
+            return;
+        }
+        this._maxSize = size;
     }
 }

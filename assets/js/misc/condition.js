@@ -101,12 +101,7 @@ export class Condition_Skill_Level extends Condition {
     }
 
     checkCondition() {
-        if (this.skill.level >= this.skillLevel) {
-            console.log("Condition skill level passed.");
-            return true;
-        }
-        console.log("Condition skill level failed.");
-        return false;
+        return this.skill.level >= this.skillLevel;
     }
 
     getConditionString() {

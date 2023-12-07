@@ -32,6 +32,8 @@ export class Skill {
         this.name = ""; 
         /** The icon of the skill. */
         this.icon = skillData.icon === undefined ? "" : skillData.icon;
+        /** The maximum level of the skill. */
+        this.levelCap = skillData.levelCap === undefined ? 30 : skillData.levelCap;
         /** @private The current level of the skill. */
         this._level = 1;
         /** @private The current xp of the skill. */
@@ -47,18 +49,33 @@ export class Skill {
         return this._level;
     }
 
+    /** The string to display the current level of the skill. */
+    get levelString() {
+        return this.game.languages.getString("level") + " : " + this._level + " / " + this.levelCap;
+    }
+
     /** The current xp of the skill. */
     get xp() {
         return this._xp;
     }
 
+    /** The string to display the current xp of the skill. */
+    get xpString() {
+        return this.isMaxLevel ? this.game.languages.getString("max") : this.game.languages.getString("xp") + " : " + Math.floor(this._xp) + " / " + Math.floor(this.maxXp);
+    }
+
     /** The max xp for the current level. */
     get maxXp() {
-        return Math.pow(this.level * 2, 2);
+        return Math.pow(this._level * 2, 2);
     }
+
     /** The xp percent formatted to 2 digits after the decimal. */
     get xpPercent() {
-        return toPercent(this.xp, this.maxXp);
+        return toPercent(this._xp, this.maxXp);
+    }
+
+    get isMaxLevel() {
+        return this._level >= this.levelCap;
     }
     
     /** The current skill xp multiplier. */
@@ -75,8 +92,8 @@ export class Skill {
     save() {
         return {
             id: this.id,
-            level: this.level,
-            xp: this.xp
+            level: this._level,
+            xp: this._xp
         }
     }
 
@@ -86,10 +103,26 @@ export class Skill {
      */
     load(skillSave = {}) {
         if (skillSave.level !== undefined && !isNaN(skillSave.level)) {
-            this._level = skillSave.level;
+            if (skillSave.level < 1) {
+                this._level = 1;
+            }
+            else if (skillSave.level > this.levelCap) {
+                this._level = this.levelCap;
+            }
+            else {
+                this._level = skillSave.level;
+            }
         }
         if (skillSave.xp !== undefined && !isNaN(skillSave.xp)) {
-            this._xp = skillSave.xp;
+            if (skillSave.xp < 0 || this._level === this.levelCap) {
+                this._xp = 0;
+            }
+            else if (skillSave.xp > this.maxXp) {
+                this._xp = this.maxXp;
+            }
+            else {
+                this._xp = skillSave.xp;
+            }
         }
     }
     
@@ -184,13 +217,13 @@ export class Skill {
     addXp(amount) {
         const startAmount = amount;
         let maxXp = this.maxXp;
-        while (amount > 0) {
-            if (this.xp > maxXp) {
-                amount += this.xp - maxXp;
+        while (amount > 0 && this._level < this.levelCap) {
+            if (this._xp > maxXp) {
+                amount += this._xp - maxXp;
                 maxXp = this.levelUp();
             }
-            else if (this.xp + amount >= maxXp) {
-                amount -= maxXp - this.xp;
+            else if (this._xp + amount >= maxXp) {
+                amount -= maxXp - this._xp;
                 maxXp = this.levelUp();
             }
             else {
@@ -198,7 +231,10 @@ export class Skill {
                 amount = 0;
             }
         }
-        this.game.events.dispatch("xpAdded", {skill: this, amount: startAmount});
+        const addedAmount = startAmount - amount;
+        if (addedAmount > 0) {
+            this.game.events.dispatch("xpAdded", {skill: this, amount: addedAmount});
+        }
     }
 
     /**

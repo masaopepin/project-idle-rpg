@@ -1,9 +1,6 @@
 import { Modal_Generic } from "./modal_generic.js";
-import { createGenericButton, createGenericElement, removeChildren, setButtonDisabled } from "../../helpers/helpers_html.js";
+import { createGenericButton, createGenericElement, setButtonDisabled } from "../../helpers/helpers_html.js";
 import { Input_Range_Number } from "../inputs/input_range_number.js";
-import { toPercent } from "../../helpers/format_string.js";
-import { Rewards } from "../../misc/reward.js";
-import { Conditions } from "../../misc/condition.js";
 
 /**
  * Class for the inventory modal.
@@ -16,7 +13,6 @@ export class Modal_Inventory extends Modal_Generic {
      */
     constructor(game, parent) {
         super(parent, "modal-inventory", "modal-lg")
-        const root = createGenericElement(this.modalBody, {className: "row"});
         this.game = game;
         this.inventorySlot = null;
         this.conditions = game.errors.conditions;
@@ -25,13 +21,14 @@ export class Modal_Inventory extends Modal_Generic {
         this.sellString = game.languages.getString("sell");
         this.quantityString = game.languages.getString("quantity") + " ";
  
-        this.conditionsLabel = createGenericElement(root);
-        this.description = createGenericElement(root, {className: "col-12 mb-2"});
-        this.multipliersRoot = createGenericElement(root, {className: "col-12"});
+        this.conditionsLabel = createGenericElement(this.modalBody);
+        this.description = createGenericElement(this.modalBody);
+        this.multipliers = createGenericElement(this.modalBody);
 
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
         this.rewardLabels = new Set();
-        this.rewardsRoot = createGenericElement(root, {className: "col-12 my-1"});
+        const rewardSection = this.createRewardSection(game, this.modalBody, false);
+        this.rewardsRoot = createGenericElement(rewardSection);
 
         this.inputs = new Input_Range_Number(this.modalBody);
         this.inputs.inputRange.oninput = () => { this.updateInputValue(this.inputs.inputRange.value); };
@@ -50,20 +47,14 @@ export class Modal_Inventory extends Modal_Generic {
         const item = inventorySlot.item;
         this.inputs.setNameAttribute(this.quantityString + item.name);
         this.modalTitle.innerHTML = item.name;
-        this.conditions = new Conditions(this.game, item.conditionsData);
+        
+        this.conditions = this.game.createConditions(item.conditionsData);
         this.updateConditions();
         this.description.innerHTML = item.description;
-        
-        // Multipliers
-        removeChildren(this.multipliersRoot);
-        for (const [multiplier, value] of Object.entries(item.multipliers)) {
-            const multiplierDiv = createGenericElement(this.multipliersRoot, {className: "d-flex"});
-            createGenericElement(multiplierDiv, {className: "fs-6", innerHTML: this.game.languages.getString(multiplier)});
-            createGenericElement(multiplierDiv, {className: "col text-end fs-6", innerHTML: toPercent(value, 1)});
-        }
-        this.updateInputValue(1);
+        this.createMultiplierSection(this.game, this.multipliers, item.multipliers);
 
-        this.rewardLabels = new Rewards(this.game, item.sellData).createRewardLabels(this.rewardsRoot, () => { return this.inputs.value; });
+        this.updateInputValue(1);
+        this.rewardLabels = this.game.createRewards(item.sellData).createRewardLabels(this.rewardsRoot, () => { return this.inputs.value; });
 
         // Equip button
         const equipmentSlot = this.game.equipments.getEquipmentSlot(item.typeId);
@@ -96,7 +87,7 @@ export class Modal_Inventory extends Modal_Generic {
     }
 
     /**
-     * Update the inputs and action button.
+     * Update the inputs and sell button.
      * @param {string | number} inputValue The new inputs value string.
      */
     updateInputValue(inputValue) {

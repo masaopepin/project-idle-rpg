@@ -5,8 +5,10 @@ import { createGenericElement, createGenericImage } from "../../helpers/helpers_
  * @typedef IconLabelData
  * @prop {Function} [updateFunction] Optional function to be called when updating the label.
  * @prop {string} [source] Optional source of the the icon.
- * @prop {string} [innerHTML] Optional innerHTML of the label. Used when the label doesn't have an update function.
  * @prop {string} [size] Optional size of the icon. Defaults to "32px".
+ * @prop {string} [iconClass] Optional bootstrap icon class to use instead of source.
+ * @prop {string} [iconFontSize] Optional font size of the bootstrap icon. Defaults to "2rem".
+ * @prop {string} [innerHTML] Optional innerHTML of the label. Used when the label doesn't have an update function.
  * @prop {string} [tooltip] Optional tooltip to display when hovering the icon.
  */
 
@@ -23,10 +25,18 @@ export class Icon_Label {
         /** The root element of the icon */
         this.root = createGenericElement(parent, {className: "d-flex align-items-center"});
 
-        const source = labelData.source === undefined ? "" : labelData.source
-        const size = labelData.size === undefined ? "32px" : labelData.size;
+        let icon = null;
+        if (labelData.iconClass !== undefined) {
+            const iconFontSize = labelData.iconFontSize === undefined ? "2rem" : labelData.iconFontSize;
+            icon = createGenericElement(this.root, {className: labelData.iconClass, styles: {"font-size": iconFontSize}});
+        }
+        else {
+            const source = labelData.source === undefined ? "" : labelData.source
+            const size = labelData.size === undefined ? "32px" : labelData.size;
+            icon = createGenericImage(this.root, {attributes: {"src": source}, styles: {"width": size}});
+        }
         /** The icon element. */
-        this.icon = createGenericImage(this.root, {attributes: {"src": source}, styles: {"width": size}});
+        this.icon = icon;
         if (labelData.tooltip !== undefined) {
             this.icon.setAttribute("data-bs-toggle", "tooltip");
             this.icon.setAttribute("data-bs-title", labelData.tooltip);

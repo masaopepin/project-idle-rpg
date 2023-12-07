@@ -16,7 +16,7 @@ export class Smithing extends Skill {
                     {
                         id: "bronzeIngot",
                         actionId: "action_smelt",
-                        duration: 2000,
+                        duration: 3000,
                         costsData: [
                             {
                                 type: "item",
@@ -52,7 +52,7 @@ export class Smithing extends Skill {
                     {
                         id: "ironIngot",
                         actionId: "action_smelt",
-                        duration: 2000,
+                        duration: 4000,
                         costsData: [
                             {
                                 type: "item",
@@ -83,7 +83,7 @@ export class Smithing extends Skill {
                     {
                         id: "steelIngot",
                         actionId: "action_smelt",
-                        duration: 2000,
+                        duration: 5000,
                         costsData: [
                             {
                                 type: "item",

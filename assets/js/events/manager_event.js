@@ -70,6 +70,11 @@
  * @prop {import("../actions/action.js").Action} action The action that was stopped.
  */
 
+/**
+ * @typedef upgradeApplied
+ * @prop {import("../upgrades/upgrade.js").Upgrade} upgrade The upgrade that was applied.
+ */
+
 /** Manager class for the events. */
 export class Manager_Event {
     /** @param {import("../main.js").Game_Instance} game The game instance. */
@@ -85,6 +90,7 @@ export class Manager_Event {
             itemsLoaded: new Event("itemsLoaded"),
             skillsLoaded: new Event("skillsLoaded"),
             languageLoaded: new Event("languageLoaded"),
+            upgradeApplied: new Event("upgradeApplied"),
             multipliersApplied: new Event("multipliersApplied"),
             xpAdded: new Event("xpAdded"),
             leveledUp: new Event("leveledUp"),

@@ -16,7 +16,7 @@ export class Cooking extends Skill {
                     {
                         id: "sardine",
                         actionId: "action_cook",
-                        duration: 2000,
+                        duration: 3000,
                         costsData: [
                             {
                                 type: "item",
@@ -47,7 +47,7 @@ export class Cooking extends Skill {
                     {
                         id: "trout",
                         actionId: "action_cook",
-                        duration: 2000,
+                        duration: 4000,
                         costsData: [
                             {
                                 type: "item",
@@ -78,7 +78,7 @@ export class Cooking extends Skill {
                     {
                         id: "salmon",
                         actionId: "action_cook",
-                        duration: 2000,
+                        duration: 5000,
                         costsData: [
                             {
                                 type: "item",

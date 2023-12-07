@@ -16,7 +16,7 @@ export class Carpentering extends Skill {
                     {
                         id: "deadTreePlank",
                         actionId: "action_saw",
-                        duration: 2000,
+                        duration: 3000,
                         costsData: [
                             {
                                 type: "item",
@@ -47,7 +47,7 @@ export class Carpentering extends Skill {
                     {
                         id: "oakPlank",
                         actionId: "action_saw",
-                        duration: 2000,
+                        duration: 4000,
                         costsData: [
                             {
                                 type: "item",
@@ -78,7 +78,7 @@ export class Carpentering extends Skill {
                     {
                         id: "maplePlank",
                         actionId: "action_saw",
-                        duration: 2000,
+                        duration: 5000,
                         costsData: [
                             {
                                 type: "item",

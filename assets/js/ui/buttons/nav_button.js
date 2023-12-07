@@ -1,25 +1,39 @@
 import { createGenericElement, createGenericLink } from "../../helpers/helpers_html.js";
 import { Icon_Label } from "../labels/icon_label.js";
 
-/** Create a new navigation button with the given parent, icon, innerHTML, and onclick function. */
+/**
+ * @typedef NavButtonData
+ * @prop {string} [source] Optional source of the icon.
+ * @prop {string} [iconClass] Optional bootstrap icon class to use instead of the source.
+ * @prop {Function} [onclick] Optional function to assign to the button onclick. Defaults to switching page using the stringId.
+ */
+
+/** Create a new navigation button for the sidebar. */
 export class Nav_Button {
     /**
-     * @param {?HTMLElement} parent Parent to append the nav button.
-     * @param {string} iconClass IconClass to apply.
-     * @param {string} stringId The unique id of the string to apply.
-     * @param {Function} onclick A function to assign to the button onclick.
+     * @param {import("../../main.js").Game_Instance} game The game instance.
+     * @param {?HTMLElement} parent Parent to append the button.
+     * @param {string} stringId The unique id of the string to assign to the button.
+     * @param {NavButtonData} buttonData An object containing info about the button.
      */
-    constructor(parent, iconClass, stringId, onclick) {
+    constructor(game, parent, stringId, buttonData = {}) {
+        this.stringId = stringId;
         const list = createGenericElement(parent, {tag: "li", className: "nav-item"});
         const link = createGenericLink(list, {
             className: "nav-link sidebar-link",
             attributes: {"role": "button", "data-bs-dismiss": "offcanvas", "data-bs-target": "#sidebarNav"}
         }, {
-            onclick: (e) => { onclick(e); }
+            onclick: buttonData.onclick === undefined ? () => { game.pages.switchPage(this.stringId); } : buttonData.onclick
         });
 
-        this.stringId = stringId;
-        this.iconLabel = new Icon_Label(link, {source: iconClass});
-        this.iconLabel.label.classList.add("fs-6");
+        this.iconLabel = new Icon_Label(link, {source: buttonData.source, iconClass: buttonData.iconClass});
+    }
+
+    /**
+     * Update the nav button text using the stringId.
+     * @param {import("../../main.js").Game_Instance} game The game instance. 
+     */
+    update(game) {
+        this.iconLabel.label.innerHTML = game.languages.getString(this.stringId);
     }
 }

@@ -12,6 +12,11 @@ import { Manager_Skill } from "./skills/manager_skill.js";
 import { Multipliers } from "./misc/multipliers.js";
 import { Manager_Inventory } from "./items/manager_inventory.js";
 import { Manager_Equipment } from "./items/manager_equipment.js";
+import { Manager_Upgrade } from "./upgrades/manager_upgrade.js";
+import { Costs } from "./misc/cost.js";
+import { Rewards } from "./misc/reward.js";
+import { Conditions } from "./misc/condition.js";
+import { Item } from "./items/item.js";
 
 /** Main object of the game. */
 export class Game_Instance {
@@ -25,6 +30,8 @@ export class Game_Instance {
         this.settings.load(load("Settings"));
         /** Manager for the languages. */
         this.languages = new Manager_Language(this);
+        /** Class that contains all multipliers that can modify values. */
+        this.multipliers = new Multipliers(this);
         /** Manager for the items. */
         this.items = new Manager_Item(this);
         /** Manager for the inventory. */
@@ -35,16 +42,52 @@ export class Game_Instance {
         this.skills = new Manager_Skill(this);
         /** Class that contains all info about the actions. */
         this.actions = new Manager_Action(this);
+        /** Manager for the upgrades. */
+        this.upgrades = new Manager_Upgrade(this);
         /** Manager for the shops. */
         this.shops = new Manager_Shop(this);
         /** Class that contains all info about the player. */
         this.player = new Player();
         this.player.load(this, load("Player"));
-        /** Class that contains all multipliers that can modify values. */
-        this.multipliers = new Multipliers(this);
         this.multipliers.applyMultipliers();
         /** Manager for the pages. */
         this.pages = new Manager_Page(this);
+    }
+
+    /**
+     * Create a new item from the given data.
+     * @param {import("./items/item.js").ItemData} itemData The item data to create the item.
+     * @returns The new item.
+     */
+    createItem(itemData = {}) {
+        return new Item(itemData);
+    }
+
+    /**
+     * Create a new conditions from the given data.
+     * @param {import("./misc/condition.js").ConditionData[]} conditionsData The array of condition data to create the conditions.
+     * @returns The new conditions.
+     */
+    createConditions(conditionsData = []) {
+        return new Conditions(this, conditionsData);
+    }
+
+    /**
+     * Create a new costs from the given data.
+     * @param {import("./misc/cost.js").CostData[]} costsData The array of cost data to create the costs.
+     * @returns The new costs.
+     */
+    createCosts(costsData = []) {
+        return new Costs(this, costsData);
+    }
+
+    /**
+     * Create a new rewards from the given data.
+     * @param {import("./misc/reward.js").RewardData[]} rewardsData The array of reward data to create the rewards.
+     * @returns The new rewards.
+     */
+    createRewards(rewardsData = []) {
+        return new Rewards(this, rewardsData);
     }
 }
 

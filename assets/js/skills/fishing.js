@@ -15,7 +15,7 @@ export class Fishing extends Skill {
                 {
                     id: "node_sardineFish",
                     actionId: "action_fish",
-                    duration: 2000,
+                    duration: 3000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -39,7 +39,7 @@ export class Fishing extends Skill {
                 {
                     id: "node_troutFish",
                     actionId: "action_fish",
-                    duration: 3000,
+                    duration: 4000,
                     conditionsData: [
                         {
                             type: "skillLevel",
@@ -63,7 +63,7 @@ export class Fishing extends Skill {
                 {
                     id: "node_salmonFish",
                     actionId: "action_fish",
-                    duration: 4000,
+                    duration: 5000,
                     conditionsData: [
                         {
                             type: "skillLevel",

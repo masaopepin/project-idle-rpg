@@ -40,14 +40,26 @@ export class Page {
     }
 
     /**
-     * Create a section with a given title.
+     * Create a section with an optional title.
      * @param {HTMLElement} parent Parent to append the section.
-     * @param {string} innerHTML InnerHTML to apply.
+     * @param {string} [innerHTML] Optional innerHTML of the title.
      * @returns The section root element.
      */
     createSectionTitle(parent, innerHTML) {
-        const section = createGenericElement(parent, {className: "section"});
-        createGenericElement(section, {tag: "h3", className: "bg-dark rounded-top py-2 text-center", innerHTML: innerHTML});
+        const section = createGenericElement(parent, {className: "section rounded-bottom-0"});
+        if (innerHTML !== undefined) {
+            this.createSectionTopRow(section, innerHTML);
+            //createGenericElement(section, {className: "bg-body rounded-top text-center py-1 fs-3", innerHTML: innerHTML});
+        }
         return section;
+    }
+
+    /**
+     * Create a top row for a given section.
+     * @param {HTMLElement} parent Parent to append the row.
+     * @returns The row element.
+     */
+    createSectionTopRow(parent, innerHTML) {
+        return createGenericElement(parent, {className: "row bg-body rounded-top shadow align-items-center justify-content-center py-1 fs-3", innerHTML: innerHTML});
     }
 }

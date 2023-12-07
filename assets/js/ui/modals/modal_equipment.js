@@ -1,6 +1,5 @@
 import { Modal_Generic } from "./modal_generic.js";
-import { createGenericButton, createGenericElement, removeChildren } from "../../helpers/helpers_html.js";
-import { toPercent } from "../../helpers/format_string.js";
+import { createGenericButton, createGenericElement } from "../../helpers/helpers_html.js";
 
 /**
  * Class for the equipment modal.
@@ -14,16 +13,13 @@ export class Modal_Equipment extends Modal_Generic {
     constructor(game, parent) {
         super(parent, "modal-equipment", "modal-lg");
         this.game = game;
-        const root = createGenericElement(this.modalBody, {className: "row"});
- 
-        this.description = createGenericElement(root, {className: "col-12 mb-2"});
-        this.multipliersRoot = createGenericElement(root, {className: "col-12"});
+        this.unequipString = game.languages.getString("unequip");
+        this.inventoryFullString = game.languages.getString("error_inventoryFull");
 
-        this.unequipButton = createGenericButton(this.modalFooter, {
-            className: "col btn btn-primary",
-            innerHTML: game.languages.getString("unequip"),
-            attributes: {"data-bs-dismiss": "modal"}
-        });
+        this.description = createGenericElement(this.modalBody);
+        this.multipliers = createGenericElement(this.modalBody);
+
+        this.unequipButton = createGenericButton(this.modalFooter, {className: "col btn btn-primary", attributes: {"data-bs-dismiss": "modal"}});
     }
 
     /**
@@ -34,15 +30,17 @@ export class Modal_Equipment extends Modal_Generic {
         const item = slot.item;
         this.modalTitle.innerHTML = item.name;
         this.description.innerHTML = item.description;
-        
-        removeChildren(this.multipliersRoot);
-        for (const [multiplier, value] of Object.entries(item.multipliers)) {
-            const multiplierDiv = createGenericElement(this.multipliersRoot, {className: "d-flex"});
-            createGenericElement(multiplierDiv, {className: "fs-6", innerHTML: this.game.languages.getString(multiplier)});
-            createGenericElement(multiplierDiv, {className: "col text-end fs-6", innerHTML: toPercent(value, 1)});
-        }
+        this.createMultiplierSection(this.game, this.multipliers, item.multipliers);
 
-        this.unequipButton.onclick = () => { slot.unequip(this.game); };
-        this.unequipButton.disabled = this.game.inventory.isFull;
+        if (this.game.inventory.isFull) {
+            this.unequipButton.onclick = () => {};
+            this.unequipButton.disabled = true;
+            this.unequipButton.innerHTML = this.inventoryFullString;
+        }
+        else {
+            this.unequipButton.onclick = () => { slot.unequip(this.game); };
+            this.unequipButton.disabled = false;
+            this.unequipButton.innerHTML = this.unequipString;
+        }
     }
 }
