@@ -82,6 +82,7 @@ export const LANGUAGE_EN = {
     "skills": "Skills",
     "more": "More",
     "settings": "Settings",
+    "help": "Help",
     "toggleFullscreen": "Toggle fullscreen",
     "equipments": "Equipments",
     "inventory": "Inventory",

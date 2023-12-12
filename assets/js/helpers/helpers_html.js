@@ -60,6 +60,7 @@ export function createGenericButton(parent, elementData = {}, buttonData = {}) {
 
 /**
  * @typedef GenericLinkData
+ * @prop {string} [href] Optional href to assign to the link.
  * @prop {Function} [onclick] Optional function to assign to the link onclick.
  */
 
@@ -73,8 +74,14 @@ export function createGenericButton(parent, elementData = {}, buttonData = {}) {
 export function createGenericLink(parent, elementData = {}, linkData = {}) {
     elementData.tag = "a";
     const link = createGenericElement(parent, elementData);
-    if (linkData.onclick !== undefined) {
+    if (linkData.href !== undefined) {
+        link.setAttribute("href", linkData.href);
+        link.setAttribute("target", "_blank");
+        link.setAttribute("rel", "noopener noreferrer");
+    }
+    else if (linkData.onclick !== undefined) {
         link.onclick = linkData.onclick;
+        link.setAttribute("role", "button");
     }
     return link;
 }

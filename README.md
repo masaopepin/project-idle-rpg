@@ -1,5 +1,5 @@
 # Project Idle RPG
-#### Video Demo:  <URL HERE>
+#### Video Demo:  <https://www.youtube.com/watch?v=DJcVH3TvfUs>
 #### Description:
 My final project for the CS50x course is an idle game made with JavaScript, HTML and CSS. I started working on this project on October 1, 2023 and been working on it for around 5 days a week since then. It is the cumulative work of over 400 hours of coding. I used JSDoc syntax to comment and to help IntelliSense provide me with appropriate auto-complete suggestions while writing the code. All the icons in the [assets/icons](assets/icons/) folder were made by me using GIMP 2.10.34 software. The game can be played entirely locally using the Live Server extension of VS Code or with other similar ways of starting a local server.
 

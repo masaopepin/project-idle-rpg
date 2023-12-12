@@ -5,7 +5,8 @@ import { Icon_Label } from "../labels/icon_label.js";
  * @typedef NavButtonData
  * @prop {string} [source] Optional source of the icon.
  * @prop {string} [iconClass] Optional bootstrap icon class to use instead of the source.
- * @prop {Function} [onclick] Optional function to assign to the button onclick. Defaults to switching page using the stringId.
+ * @prop {string} [href] Optional href to assign to the link.
+ * @prop {Function} [onclick] Optional function to assign to the link onclick. Defaults to switching page using the stringId.
  */
 
 /** Create a new navigation button for the sidebar. */
@@ -21,8 +22,9 @@ export class Nav_Button {
         const list = createGenericElement(parent, {tag: "li", className: "nav-item"});
         const link = createGenericLink(list, {
             className: "nav-link sidebar-link",
-            attributes: {"role": "button", "data-bs-dismiss": "offcanvas", "data-bs-target": "#sidebarNav"}
+            attributes: buttonData.href === undefined ? {"role": "button", "data-bs-dismiss": "offcanvas", "data-bs-target": "#sidebarNav"} : {"role": "button"}
         }, {
+            href: buttonData.href,
             onclick: buttonData.onclick === undefined ? () => { game.pages.switchPage(this.stringId); } : buttonData.onclick
         });
 

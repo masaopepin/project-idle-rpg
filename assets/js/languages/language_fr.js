@@ -82,6 +82,7 @@ export const LANGUAGE_FR = {
     "skills": "Compétences",
     "more": "Plus",
     "settings": "Paramètres",
+    "help": "Aide",
     "toggleFullscreen": "Basculer plein écran",
     "equipments": "Équipements",
     "inventory": "Inventaire",

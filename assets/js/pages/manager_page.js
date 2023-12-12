@@ -71,6 +71,7 @@ export class Manager_Page {
         this.moreToggle = document.getElementById("more-toggle");
         const morePages = document.getElementById("more-pages");
         this.navButtons.add(new Nav_Button(this.game, morePages, "settings", {source: "./assets/icons/misc/settings.png"}));
+        this.navButtons.add(new Nav_Button(this.game, morePages, "help", {iconClass: "bi bi-question-circle", href: "https://github.com/masaopepin/project-idle-rpg/"}));
         this.navButtons.add(new Nav_Button(this.game, morePages, "toggleFullscreen", {iconClass: "bi bi-arrows-fullscreen", onclick: () => { this.toggleFullscreen(); }}));
 
         if (this.game.languages.isLanguageLoaded === true) {
