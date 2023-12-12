@@ -126,12 +126,21 @@ export class Page_Summary extends Page {
         this.multipliers = {};
     }
 
+    /**
+     * Add a new action row to the action table.
+     * @param {HTMLElement} parent The parent to append the action row.
+     * @param {import("../actions/action.js").Action} action The action to associate with the row.
+     */
     addActionRow(parent, action) {
         const tr = createGenericElement(parent, {tag: "tr"});
         const td = createGenericElement(tr, {tag: "td"});
         this.actionRows.add(new Action_Row(this.game, td, action));
     }
 
+    /**
+     * Remove an action row from the action table.
+     * @param {import("../actions/action.js").Action} action The action associated with the row.
+     */
     removeActionRow(action) {
         for (const actionRow of this.actionRows) {
             if (actionRow.action === action) {

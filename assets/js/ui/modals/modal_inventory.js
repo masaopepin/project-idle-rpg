@@ -27,8 +27,8 @@ export class Modal_Inventory extends Modal_Generic {
 
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
         this.rewardLabels = new Set();
-        const rewardSection = this.createRewardSection(game, this.modalBody, false);
-        this.rewardsRoot = createGenericElement(rewardSection);
+        this.rewardSection = this.createRewardSection(game, this.modalBody, false);
+        this.rewardsRoot = createGenericElement(this.rewardSection);
 
         this.inputs = new Input_Range_Number(this.modalBody);
         this.inputs.inputRange.oninput = () => { this.updateInputValue(this.inputs.inputRange.value); };
@@ -73,11 +73,13 @@ export class Modal_Inventory extends Modal_Generic {
             this.sellButton.onclick = () => {};
             this.sellButton.classList.add("d-none");
             this.inputs.root.classList.add("d-none");
+            this.rewardSection.classList.add("d-none");
         }
         else {
             this.sellButton.onclick = () => { inventorySlot.sellItem(this.game, this.inputs.value); };
             this.sellButton.classList.remove("d-none");
             this.inputs.root.classList.remove("d-none");
+            this.rewardSection.classList.remove("d-none");
         }
     }
 

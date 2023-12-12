@@ -2,7 +2,6 @@ import { save } from "./save_game.js";
 
 /**
  * @typedef PlayerSave
- * @prop {number} maxActiveActions
  * @prop {import("../items/manager_inventory.js").InventorySave[]} inventory
  * @prop {import("../items/manager_equipment.js").EquipmentSave[]} equipments
  * @prop {import("../skills/skill.js").SkillSave[]} skills

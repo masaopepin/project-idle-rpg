@@ -14,7 +14,7 @@ export class Toast_Generic {
      */
     constructor(parent, toastData = {}) {
         this.root = createGenericElement(parent, {className: "d-flex"});
-        let attributes = toastData.isAlert === undefined || toastData.isAlert === true ? {"role": "alert", "aria-live": "assertive", "aria-atomic": "true"} : {"role": "status", "aria-live": "polite", "aria-atomic": "true"};
+        let attributes = toastData.isAlert === undefined || toastData.isAlert === true ? {"role": "alert", "aria-live": "assertive"} : {"role": "status", "aria-live": "polite"};
         attributes["aria-atomic"] = "true";
         attributes["data-bs-delay"] = toastData.delay === undefined ? "3000" : toastData.delay;
         this.toast = this.toast = createGenericElement(this.root, {className: "toast", attributes: attributes});

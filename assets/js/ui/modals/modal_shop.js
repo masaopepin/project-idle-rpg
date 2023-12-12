@@ -34,6 +34,7 @@ export class Modal_Shop extends Modal_Generic {
         this.inventoryAmount = createGenericElement(inventoryAmountDiv, {className: "ms-1", innerHTML: "0"});
 
 
+        this.multipliers = createGenericElement(this.modalBody);
         /** @type {Set.<import("../labels/icon_label.js").Icon_Label>} */
         this.costLabels = new Set();
         this.costsRoot = this.createCostSection(game, this.modalBody, false);
@@ -61,10 +62,7 @@ export class Modal_Shop extends Modal_Generic {
         this.description.innerHTML = item.description;
         this.stockAmount.innerHTML = shopItem.stock;
         this.inventoryAmount.innerHTML = item.amount;
-
-        for (const [multiplier, value] of Object.entries(item.multipliers)) {
-
-        }
+        this.createMultiplierSection(this.game, this.multipliers, item.multipliers);
         this.costLabels = costs.createOwnedCostLabels(this.costsRoot, () => { return this.inputs.value; });
         this.updateInputs(1);
         this.buyButton.onclick = () => { this.shopItem.buy(this.game, this.inputs.value); };

@@ -1,33 +1,35 @@
 # Project Idle RPG
 #### Video Demo:  <URL HERE>
 #### Description:
-My final project for the CS50x course is an idle game made with JavaScript, HTML and CSS. I started working on this project on October 1, 2023 and been working on it for around 5 days a week since then. It is the cumulative work of over 400 hours of coding and drawing. I used JSDoc syntax to comment and to help IntelliSense provide me with appropriate auto-complete suggestions while writing the code. All the icons in the [assets/icons](assets/icons/) folder were made by me using the GIMP 2.10.34 software. The game can be played entirely locally using the Live Server extension of VS Code or with other similar ways of starting a local server.
+My final project for the CS50x course is an idle game made with JavaScript, HTML and CSS. I started working on this project on October 1, 2023 and been working on it for around 5 days a week since then. It is the cumulative work of over 400 hours of coding. I used JSDoc syntax to comment and to help IntelliSense provide me with appropriate auto-complete suggestions while writing the code. All the icons in the [assets/icons](assets/icons/) folder were made by me using GIMP 2.10.34 software. The game can be played entirely locally using the Live Server extension of VS Code or with other similar ways of starting a local server.
 
 The main game loop is simple:
 <details><summary>Gather</summary>
 
 ***Use one of the gathering skills (Fishing, Mining or Woodcutting) to collect resources that can be sold, used in crafting recipes or used to purchase upgrades.***
-
-- To start gathering, choose one of the gathering skills from the navigation bar, then click on the gathering node button you want to start.
+- To start gathering, select one of the gathering skills from the navigation bar, then click on the gathering node button you want to start.
 - Each node can have conditions that must be met before being able to gather from the node. These conditions will appear below the node button when they fail.
 - All gathering actions automatically stop when reaching the inventory size limit.
 </details>
 <details><summary>Craft</summary>
 
-***Use one of the crafting skills (Cooking, Smithing, Carpentering) to turn resources into materials that can be sold or used to purchase upgrades.***
-
-- To start crafting, choose one of the crafting skills from the navigation bar, then click on a crafting recipe button to open the crafting modal. Select the number of time to repeat the recipe, then click the action button.
+***Use one of the crafting skills (Cooking, Smithing, Carpentering) to turn resources into products that can be sold or used to purchase upgrades.***
+- To start crafting, select one of the crafting skills from the navigation bar, then click on a crafting recipe button to open the crafting modal. Choose the number of time to repeat the recipe, then click the action button.
 - Each recipe can have conditions that must be met before being able to craft the recipe. These conditions will appear on the recipe button instead of the recipe name when they fail.
 - You can stop the crafting action at any time to get a refund of the unused ingredients. This refund can go over the inventory size limit to make sure you don't lose items in the process.
 - All crafting actions automatically stop when reaching the inventory size limit, refunding the unused ingredients.
 </details>
+<details><summary>Sell</summary>
+
+***Earn money that can be used to purchase upgrades.***
+- To sell, select the inventory from the navigation bar, then click on an item to open the inventory modal. Choose the amount to sell, then click the sell button.
+</details>
 <details><summary>Upgrade</summary>
 
-***Use your hard-earned money, resources and materials to purchase upgrades that will enhance your character.***
-
-- To upgrade, choose the shop from the navigation bar, then click on a buy button to open the shop modal. Select the amount to purchase, then click the buy button.
+***Use your hard-earned money, resources and products to purchase upgrades that will enhance your character.***
+- To upgrade, click on an upgrade button (green button with a "+" sign) or select the shop from the navigation bar, then click on a buy button to open the shop modal. Choose the amount to purchase, then click the buy button.
 - Each upgrade can have conditions that must be met before being able to buy the upgrade. These conditions will appear above the buy button when they fail.
-- After purchasing an item, choose the inventory from the navigation bar, then click on the icon of the item to open the inventory modal. From there you can equip or sell the item if the item can be equipped or sold by clicking the corresponding button.
+- After purchasing an item, select the inventory from the navigation bar, then click on the item to open the inventory modal. From there you can equip or sell the item if it can be equipped or sold by clicking the corresponding button.
 </details>
 
 ---

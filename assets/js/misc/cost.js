@@ -1,12 +1,12 @@
+import { removeChildren } from "../helpers/helpers_html.js";
+import { Icon_Label } from "../ui/labels/icon_label.js";
+
 /**
  * @typedef CostData
  * @prop {string} type The type of the cost. Can be "item".
  * @prop {number} amount The amount of currency needed. Can be any positive number.
  * @prop {string} [itemId] Optional unique id of the item used as currency.
  */
-
-import { removeChildren } from "../helpers/helpers_html.js";
-import { Icon_Label } from "../ui/labels/icon_label.js";
 
 /** Class that can hold multiple cost. */
 export class Costs {

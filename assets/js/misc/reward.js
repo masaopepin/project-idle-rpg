@@ -1,3 +1,6 @@
+import { removeChildren } from "../helpers/helpers_html.js";
+import { Icon_Label } from "../ui/labels/icon_label.js";
+
 /**
  * @typedef RewardData
  * @prop {string} type The type of the reward. Can be "skillXp" or "item".
@@ -5,9 +8,6 @@
  * @prop {string} [skillId] Optional unique id of the skill associated with the reward.
  * @prop {string} [itemId] Optional unique id of the item associated with the reward.
  */
-
-import { removeChildren } from "../helpers/helpers_html.js";
-import { Icon_Label } from "../ui/labels/icon_label.js";
 
 /** Class that can hold multiple rewards. */
 export class Rewards {

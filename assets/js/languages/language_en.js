@@ -118,7 +118,7 @@ export const LANGUAGE_EN = {
     "type_smithingTools": "Smithing tools",
     "type_carpenteringTools": "Carpentering tools",
     "money": "Money",
-    "money_desc": "Used to purchase items in the shop.",
+    "money_desc": "Used to purchase upgrades and items in the shop.",
     "bronzeRod": "Bronze rod",
     "bronzeRod_desc": "A fishing rod made from bronze.",
     "ironRod": "Iron rod",

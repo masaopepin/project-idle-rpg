@@ -118,7 +118,7 @@ export const LANGUAGE_FR = {
     "type_smithingTools": "Outils de métallurgie",
     "type_carpenteringTools": "Outils de menuiserie",
     "money": "Argent",
-    "money_desc": "Utilisé pour acheter des objets dans le magasin.",
+    "money_desc": "Utilisé pour acheter des améliorations et des objets dans le magasin.",
     "bronzeRod": "Canne de bronze",
     "bronzeRod_desc": "Une canne à pêche fabriquée en bronze.",
     "ironRod": "Canne de fer",

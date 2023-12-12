@@ -1,4 +1,5 @@
 import { createGenericElement } from "../helpers/helpers_html.js";
+
 /** 
  * Base class for "pages" generated in JavaScript.
  * All pages extend this class and implement enter, update and exit functions.
@@ -49,7 +50,6 @@ export class Page {
         const section = createGenericElement(parent, {className: "section rounded-bottom-0"});
         if (innerHTML !== undefined) {
             this.createSectionTopRow(section, innerHTML);
-            //createGenericElement(section, {className: "bg-body rounded-top text-center py-1 fs-3", innerHTML: innerHTML});
         }
         return section;
     }

@@ -155,11 +155,13 @@ export class Page_Settings extends Page {
         }});
     }
 
+    /** Delete the player save from the local storage and reload the page. */
     deleteCharacter() {
         localStorage.removeItem("Player");
         location.reload();
     }
 
+    /** Delete the settings save from the local storage and reload the page. */
     restoreSettings() {
         localStorage.removeItem("Settings");
         location.reload();

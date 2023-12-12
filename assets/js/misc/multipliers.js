@@ -32,7 +32,6 @@ export class Multipliers {
         const eventData = e.eventData;
 
         this.addMultipliers(eventData.item.multipliers);
-        this.game.events.dispatch("multipliersApplied", null);
     }
 
     itemUnequipped(e) {
@@ -42,7 +41,6 @@ export class Multipliers {
         for (const [id, value] of Object.entries(eventData.item.multipliers)) {
             this.addMultiplier(id, value * -1);
         }
-        this.game.events.dispatch("multipliersApplied", null);
     }
 
     /** Calculate and assign the value of all multipliers. */
@@ -52,7 +50,6 @@ export class Multipliers {
                 this.addMultipliers(slot.item.multipliers);
             }
         }
-        this.game.events.dispatch("multipliersApplied", null);
     }
 
     /** @returns The entries of all multipliers. */
